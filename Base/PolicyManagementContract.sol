@@ -72,6 +72,11 @@ contract PolicyManagement {
     mapping (uint => Policy) public policies;
 
     // FUNCTIONS
+    constructor()
+    {
+        admin = msg.sender;
+    }
+    
     function policy_add(
         /*ADD ARGUMENTS LATER*/
     )

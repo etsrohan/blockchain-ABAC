@@ -32,6 +32,11 @@ contract SubjectAttribute {
     event NewSubjectAdded(uint256 sub_id);
 
     // FUNCTIONS
+    constructor()
+    {
+        admin = msg.sender;
+    }
+    
     function subject_add(
         bytes32 sub_name
         /*ADD ARGUMENTS*/
