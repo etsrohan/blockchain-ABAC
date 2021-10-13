@@ -79,15 +79,48 @@ contract PolicyManagement {
     }
     
     function policy_add(
-        /*ADD ARGUMENTS LATER*/
+        /**SUBJECT ARGUMENTS**/
+        bytes32[6] memory sub_arg,
+        /**OBJECT ARGUMENTS**/
+        bytes32[6] memory obj_arg,
+        /**ACTION ARGUMENTS**/
+        bool[3] memory act_arg,
+        /**CONTEXT ARGUMENTS**/
+        uint8 con_mode,
+        uint256[2] memory con_time
+
     )
         public
         admin_only()
     {
+        // Generating pol_id for new policy
         uint256 pol_id = total_policies;
         total_policies++;
+        // Setting policy state to "Active"
         policies[pol_id].state = PolicyState.Active;
-        // Add Subject and Object Info
+        // Add Subject Info
+        policies[pol_id].subject.name = sub_arg[0];
+        policies[pol_id].subject.organization = sub_arg[1];
+        policies[pol_id].subject.department = sub_arg[2];
+        policies[pol_id].subject.lab = sub_arg[3];
+        policies[pol_id].subject.role = sub_arg[4];
+        policies[pol_id].subject.other = sub_arg[5];
+        // Add Object Info
+        policies[pol_id].object.name = obj_arg[0];
+        policies[pol_id].object.organization = obj_arg[1];
+        policies[pol_id].object.department = obj_arg[2];
+        policies[pol_id].object.lab = obj_arg[3];
+        policies[pol_id].object.place = obj_arg[4];
+        policies[pol_id].object.other = obj_arg[5];
+        // Add Actions Permitted
+        policies[pol_id].action.read = act_arg[0];
+        policies[pol_id].action.write = act_arg[1];
+        policies[pol_id].action.execute = act_arg[2];
+        // Add Context
+        policies[pol_id].context.mode = con_mode;
+        policies[pol_id].context.start_time = con_time[0];
+        policies[pol_id].context.end_time = con_time[1];
+
         emit PolicyAdded(pol_id);
     }
 
