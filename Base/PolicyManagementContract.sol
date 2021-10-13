@@ -8,22 +8,22 @@ contract PolicyManagement {
     // STRUCTS
     // Object Attributes
     struct Object{
-        bytes32 name;
-        bytes32 organization;
-        bytes32 department;
-        bytes32 lab;
-        bytes32 place;
-        bytes32 other;
+        string name;
+        string organization;
+        string department;
+        string lab;
+        string place;
+        string other;
     }
 
     // Subject Attributes
     struct Subject{
-        bytes32 name;
-        bytes32 organization;
-        bytes32 department;
-        bytes32 lab;
-        bytes32 role;
-        bytes32 other;
+        string name;
+        string organization;
+        string department;
+        string lab;
+        string role;
+        string other;
     }
 
     // Actions allowed
@@ -80,15 +80,14 @@ contract PolicyManagement {
     
     function policy_add(
         /**SUBJECT ARGUMENTS**/
-        bytes32[6] memory sub_arg,
+        string[] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        bytes32[6] memory obj_arg,
+        string[] memory obj_arg,
         /**ACTION ARGUMENTS**/
-        bool[3] memory act_arg,
+        bool[] memory act_arg,
         /**CONTEXT ARGUMENTS**/
         uint8 con_mode,
-        uint256[2] memory con_time
-
+        uint256[] memory con_time
     )
         public
         admin_only()
@@ -149,6 +148,10 @@ contract PolicyManagement {
         
         if (suspend) policies[pol_id].state == PolicyState.Suspended;
     }
+    
+    // function get_bytes(string memory word) pure public returns (bytes memory){
+    //     return bytes(word);
+    // }
 
     // function find_exact_match_policy()
     // function find_match_policy()

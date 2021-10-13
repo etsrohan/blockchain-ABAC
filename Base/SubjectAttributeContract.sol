@@ -8,12 +8,12 @@ contract SubjectAttribute {
     // STRUCTS
     struct Subject{
         SubjectState state;
-        bytes32 name;
-        bytes32 organization;
-        bytes32 department;
-        bytes32 lab;
-        bytes32 role;
-        bytes32 other;
+        string name;
+        string organization;
+        string department;
+        string lab;
+        string role;
+        string other;
     }
 
     // VARIABLES
@@ -38,7 +38,7 @@ contract SubjectAttribute {
     }
     
     function subject_add(
-        bytes32 sub_name
+        string memory sub_name
         /*ADD ARGUMENTS*/
     )
         public
