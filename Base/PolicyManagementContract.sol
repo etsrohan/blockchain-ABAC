@@ -40,6 +40,7 @@ contract PolicyManagement {
         uint8 mode;
         uint256 start_time;
         uint256 end_time;
+        // uint256 min_interval;
     }
 
     // Policy Structure
