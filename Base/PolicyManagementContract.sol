@@ -257,7 +257,10 @@ contract PolicyManagement {
         return ret;
     }
     
-    
+    // This Function checks every policy in the policies list/array and returns
+    // every element that somewhat matches the arguments given
+    // if the argument or policy field is "" empty string (Applies to All) then it checks next field
+    // returns empty list if no matches were found.
     function find_match_policy(
         /**SUBJECT ARGUMENTS**/
         string[] memory sub_arg,
@@ -273,19 +276,55 @@ contract PolicyManagement {
         uint256[] memory ret;
         for (count = 0; count < total_policies; count++){
             // Subject Comparison
-            if ((keccak256(abi.encode(sub_arg[0])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.name)))         != keccak256(abi.encodePacked(sub_arg[0]))) continue;
-            if ((keccak256(abi.encode(sub_arg[1])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.organization))) != keccak256(abi.encodePacked(sub_arg[1]))) continue;
-            if ((keccak256(abi.encode(sub_arg[2])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.department)))   != keccak256(abi.encodePacked(sub_arg[2]))) continue;
-            if ((keccak256(abi.encode(sub_arg[3])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.lab)))          != keccak256(abi.encodePacked(sub_arg[3]))) continue;
-            if ((keccak256(abi.encode(sub_arg[4])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.role)))         != keccak256(abi.encodePacked(sub_arg[4]))) continue;
-            if ((keccak256(abi.encode(sub_arg[5])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].subject.other)))        != keccak256(abi.encodePacked(sub_arg[5]))) continue;
+            if ((keccak256(abi.encodePacked(sub_arg[0])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.name)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.name)) != keccak256(abi.encodePacked(sub_arg[0])))) continue;
+
+            if ((keccak256(abi.encodePacked(sub_arg[1])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.organization)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.organization)) != keccak256(abi.encodePacked(sub_arg[1])))) continue;
+
+            if ((keccak256(abi.encodePacked(sub_arg[2])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.department)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.department)) != keccak256(abi.encodePacked(sub_arg[2])))) continue;
+
+            if ((keccak256(abi.encodePacked(sub_arg[3])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.lab)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.lab)) != keccak256(abi.encodePacked(sub_arg[3])))) continue;
+
+            if ((keccak256(abi.encodePacked(sub_arg[4])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.role)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.role)) != keccak256(abi.encodePacked(sub_arg[4])))) continue;
+
+            if ((keccak256(abi.encodePacked(sub_arg[5])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.other)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.other)) != keccak256(abi.encodePacked(sub_arg[5])))) continue;
+
             // Object Comparison
-            if ((keccak256(abi.encode(obj_arg[0])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.name)))          != keccak256(abi.encodePacked(obj_arg[0]))) continue;
-            if ((keccak256(abi.encode(obj_arg[1])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.organization)))  != keccak256(abi.encodePacked(obj_arg[1]))) continue;
-            if ((keccak256(abi.encode(obj_arg[2])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.department)))    != keccak256(abi.encodePacked(obj_arg[2]))) continue;
-            if ((keccak256(abi.encode(obj_arg[3])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.lab)))           != keccak256(abi.encodePacked(obj_arg[3]))) continue;
-            if ((keccak256(abi.encode(obj_arg[4])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.place)))         != keccak256(abi.encodePacked(obj_arg[4]))) continue;
-            if ((keccak256(abi.encode(obj_arg[5])) != keccak256(abi.encode(""))) && (keccak256(abi.encodePacked(policies[count].object.name)))          != keccak256(abi.encodePacked(obj_arg[5]))) continue;
+            if ((keccak256(abi.encodePacked(obj_arg[0])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.name)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.name)) != keccak256(abi.encodePacked(obj_arg[0])))) continue;
+
+            if ((keccak256(abi.encodePacked(obj_arg[1])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.organization)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.organization)) != keccak256(abi.encodePacked(obj_arg[1])))) continue;
+
+            if ((keccak256(abi.encodePacked(obj_arg[2])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.department)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.department)) != keccak256(abi.encodePacked(obj_arg[2])))) continue;
+
+            if ((keccak256(abi.encodePacked(obj_arg[3])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.lab)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.lab)) != keccak256(abi.encodePacked(obj_arg[3])))) continue;
+                
+            if ((keccak256(abi.encodePacked(obj_arg[4])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.place)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.place)) != keccak256(abi.encodePacked(obj_arg[4])))) continue;
+
+            if ((keccak256(abi.encodePacked(obj_arg[5])) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.other)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.other)) != keccak256(abi.encodePacked(obj_arg[5])))) continue;
+
             // Add entry to list of similar policies
             ret[i] = count;
             i++;
