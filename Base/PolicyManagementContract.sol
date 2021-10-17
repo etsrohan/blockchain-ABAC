@@ -76,6 +76,7 @@ contract PolicyManagement {
     uint256 public total_policies;
 
     Policy[] policies;
+    uint256[] ret_list;
 
     // FUNCTIONS
     constructor()
@@ -100,30 +101,13 @@ contract PolicyManagement {
         // Generating pol_id for new policy
         uint256 pol_id = total_policies;
         total_policies++;
-        // Setting policy state to "Active"
-        policies[pol_id].state = PolicyState.Active;
-        // Add Subject Info
-        policies[pol_id].subject.name = sub_arg[0];
-        policies[pol_id].subject.organization = sub_arg[1];
-        policies[pol_id].subject.department = sub_arg[2];
-        policies[pol_id].subject.lab = sub_arg[3];
-        policies[pol_id].subject.role = sub_arg[4];
-        policies[pol_id].subject.other = sub_arg[5];
-        // Add Object Info
-        policies[pol_id].object.name = obj_arg[0];
-        policies[pol_id].object.organization = obj_arg[1];
-        policies[pol_id].object.department = obj_arg[2];
-        policies[pol_id].object.lab = obj_arg[3];
-        policies[pol_id].object.place = obj_arg[4];
-        policies[pol_id].object.other = obj_arg[5];
-        // Add Actions Permitted
-        policies[pol_id].action.read = act_arg[0];
-        policies[pol_id].action.write = act_arg[1];
-        policies[pol_id].action.execute = act_arg[2];
-        // Add Context
-        policies[pol_id].context.mode = con_mode;
-        policies[pol_id].context.start_time = con_time[0];
-        policies[pol_id].context.end_time = con_time[1];
+        // Pushing policy arguments into a new policy
+        policies.push(Policy(
+            PolicyState.Active, 
+            Subject(sub_arg[0], sub_arg[1], sub_arg[2], sub_arg[3], sub_arg[4], sub_arg[5]), 
+            Object(obj_arg[0], obj_arg[1], obj_arg[2], obj_arg[3], obj_arg[4], obj_arg[5]), 
+            Action(act_arg[0], act_arg[1], act_arg[2]), 
+            Context(con_mode, con_time[0], con_time[1])));
 
         emit PolicyAdded(pol_id);
     }
@@ -267,13 +251,17 @@ contract PolicyManagement {
         /**OBJECT ARGUMENTS**/
         string[] memory obj_arg
     )
-        view
         public /**LATER CHANGE TO INTERNAL**/
-        returns (uint256[] memory)
     {
         uint256 count;
-        uint i = 0;
-        uint256[] memory ret;
+        uint256 i;
+        
+        // empty the ret_list before adding new elements
+        for (i = ret_list.length; i > 0; i--){
+            ret_list.pop();
+            // ret_list.length--;
+        }
+        
         for (count = 0; count < total_policies; count++){
             // Subject Comparison
             if ((keccak256(abi.encodePacked(sub_arg[0])) != keccak256(abi.encodePacked(""))) && 
@@ -326,10 +314,15 @@ contract PolicyManagement {
                 (keccak256(abi.encodePacked(policies[count].object.other)) != keccak256(abi.encodePacked(obj_arg[5])))) continue;
 
             // Add entry to list of similar policies
-            ret[i] = count;
-            i++;
+            ret_list.push(count);
         }
-
-        return ret;
+    }
+    
+    function get_ret_list ()
+        view
+        public
+        returns (uint256[] memory)
+    {
+        return ret_list;
     }
 }
