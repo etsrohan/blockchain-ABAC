@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 contract PolicyManagement {
     // ENUMS
-    enum PolicyState {NotActive, Active, Suspended, Deactivated}
+    enum PolicyState {NotActive, Active, Suspended}
 
     // STRUCTS
     // Object Attributes
@@ -35,7 +35,7 @@ contract PolicyManagement {
 
     // Context: Mode = dynamic access control i.e.
     // mode = 0 -> dynamic control OFF (don't check time)
-    // mode = 1 -> dynamic control ON (Check if withing allowed time)
+    // mode = 1 -> dynamic control ON (Check if within allowed time)
     struct Context{
         uint8 mode;
         uint256 start_time;
@@ -55,7 +55,10 @@ contract PolicyManagement {
 
     // EVENTS
     event PolicyAdded(uint256 pol_id);
+    event DuplicatePolicyExists(string[] subject, string[] object);
     event PolicyChanged(uint256 pol_id);
+    event PolicyDeleted(uint256 pol_id);
+    event PolicyNotExist(string[] subject, string[] object);
 
     // MODIFIERS
     modifier admin_only(){
@@ -66,13 +69,9 @@ contract PolicyManagement {
         require(policies[pol_id].state == PolicyState.Active);
         _;
     }
-    modifier policy_not_deactivated(uint256 pol_id){
-        require(policies[pol_id].state != PolicyState.Deactivated);
-        _;
-    }
 
     // VARIABLES
-    address admin;
+    address private admin;
     uint256 public total_policies;
 
     Policy[] policies;
@@ -82,7 +81,9 @@ contract PolicyManagement {
     constructor()
     {
         admin = msg.sender;
+        total_policies = 0;
     }
+    
     
     function policy_add(
         /**SUBJECT ARGUMENTS**/
@@ -98,50 +99,81 @@ contract PolicyManagement {
         public
         admin_only()
     {
-        // Generating pol_id for new policy
-        uint256 pol_id = total_policies;
-        total_policies++;
-        // Pushing policy arguments into a new policy
-        policies.push(Policy(
-            PolicyState.Active, 
-            Subject(sub_arg[0], sub_arg[1], sub_arg[2], sub_arg[3], sub_arg[4], sub_arg[5]), 
-            Object(obj_arg[0], obj_arg[1], obj_arg[2], obj_arg[3], obj_arg[4], obj_arg[5]), 
-            Action(act_arg[0], act_arg[1], act_arg[2]), 
-            Context(con_mode, con_time[0], con_time[1])));
-
-        emit PolicyAdded(pol_id);
+        if (find_exact_match_policy(sub_arg, obj_arg) == -1){
+            // Generating pol_id for new policy
+            uint256 pol_id = total_policies;
+            total_policies++;
+            // Pushing policy arguments into a new policy
+            policies.push(Policy(
+                PolicyState.Active,
+                Subject(sub_arg[0], sub_arg[1], sub_arg[2], sub_arg[3], sub_arg[4], sub_arg[5]), 
+                Object(obj_arg[0], obj_arg[1], obj_arg[2], obj_arg[3], obj_arg[4], obj_arg[5]), 
+                Action(act_arg[0], act_arg[1], act_arg[2]), 
+                Context(con_mode, con_time[0], con_time[1])));
+    
+            emit PolicyAdded(pol_id);
+        } else {
+            emit DuplicatePolicyExists(sub_arg, obj_arg);
+        }
     }
 
+
     function policy_delete(
-        uint256 pol_id
+        /**SUBJECT ARGUMENTS**/
+        string[] memory sub_arg,
+        /**OBJECT ARGUMENTS**/
+        string[] memory obj_arg
     )
         public
         admin_only()
-        policy_not_deactivated(pol_id)
     {
-        policies[pol_id].state = PolicyState.Deactivated;
+        int pol_id = find_exact_match_policy(sub_arg, obj_arg);
+        
+        // check to see if policy exists
+        // if it does then pop that policy out of policies
+        // if not then emit event PolicyNotExist
+        if (pol_id != -1){
+            policies[uint256(pol_id)] = policies[policies.length - 1];
+            policies.pop();
+            total_policies--;
+            emit PolicyDeleted(uint256(pol_id));
+        } else {
+            emit PolicyNotExist(sub_arg, obj_arg);
+        }
     }
+
 
     function policy_suspend(
         uint256 pol_id
     )
         public
         admin_only()
-        policy_not_deactivated(pol_id)
     {
         policies[pol_id].state = PolicyState.Suspended;
     }
+
 
     function policy_reactivate(
         uint256 pol_id
     )
         public
         admin_only()
-        policy_not_deactivated(pol_id)
     {
         policies[pol_id].state = PolicyState.Active;
     }
-
+    
+    
+    function get_policy(
+        /**POLICY ID**/
+        uint256 pol_id
+    )
+        view
+        public
+        returns (Policy memory)
+    {
+        return policies[pol_id];
+    }
+    
 
     function policy_update(
         /**POLICY ID**/
@@ -199,6 +231,7 @@ contract PolicyManagement {
         emit PolicyChanged(pol_id);
     }
     
+    
     // function get_bytes(string memory word) pure public returns (bytes memory){
     //     return bytes(word);
     // }
@@ -241,6 +274,7 @@ contract PolicyManagement {
         return ret;
     }
     
+    
     // This Function checks every policy in the policies list/array and returns
     // every element that somewhat matches the arguments given
     // if the argument or policy field is "" empty string (Applies to All) then it checks next field
@@ -259,9 +293,11 @@ contract PolicyManagement {
         // empty the ret_list before adding new elements
         for (i = ret_list.length; i > 0; i--){
             ret_list.pop();
-            // ret_list.length--;
         }
         
+        // check every field for similarity subject/object
+        // if any field is empty on policy or sub/obj side then move to next field
+        // if any field doesn't match then continue to next policy
         for (count = 0; count < total_policies; count++){
             // Subject Comparison
             if ((keccak256(abi.encodePacked(sub_arg[0])) != keccak256(abi.encodePacked(""))) && 
@@ -317,6 +353,7 @@ contract PolicyManagement {
             ret_list.push(count);
         }
     }
+    
     
     function get_ret_list ()
         view
