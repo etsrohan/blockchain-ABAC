@@ -55,7 +55,7 @@ contract PolicyManagement {
 
     // EVENTS
     event PolicyAdded(uint256 pol_id);
-    event DuplicatePolicyExists(string[] subject, string[] object);
+    event DuplicatePolicyExist(string[] subject, string[] object);
     event PolicyChanged(uint256 pol_id);
     event PolicyDeleted(uint256 pol_id);
     event PolicyNotExist(string[] subject, string[] object);
@@ -65,16 +65,12 @@ contract PolicyManagement {
         require(msg.sender == admin);
         _;
     }
-    modifier policy_active(uint256 pol_id){
-        require(policies[pol_id].state == PolicyState.Active);
-        _;
-    }
 
     // VARIABLES
     address private admin;
     uint256 public total_policies;
 
-    Policy[] policies;
+    Policy[]  policies;
     uint256[] ret_list;
 
     // FUNCTIONS
@@ -85,6 +81,9 @@ contract PolicyManagement {
     }
     
     
+    // Adds new policy with given subject, object, actions, context
+    // Checks if policy already exists, if it doesn't then adds new policy
+    // If policy already exists then emits DuplicatePolicyExist event
     function policy_add(
         /**SUBJECT ARGUMENTS**/
         string[] memory sub_arg,
@@ -113,11 +112,14 @@ contract PolicyManagement {
     
             emit PolicyAdded(pol_id);
         } else {
-            emit DuplicatePolicyExists(sub_arg, obj_arg);
+            emit DuplicatePolicyExist(sub_arg, obj_arg);
         }
     }
 
 
+    // Deletes an existing policy with given subject and object attributes
+    // Finds exact match policy and then deletes the policy
+    // If no policy found then emits PolicyNotExist event
     function policy_delete(
         /**SUBJECT ARGUMENTS**/
         string[] memory sub_arg,
@@ -143,6 +145,8 @@ contract PolicyManagement {
     }
 
 
+    // Suspends a given policy using pol_id
+    // Use find_exact_match_policy function to find pol_id
     function policy_suspend(
         uint256 pol_id
     )
@@ -152,7 +156,8 @@ contract PolicyManagement {
         policies[pol_id].state = PolicyState.Suspended;
     }
 
-
+    // Reactivates an already suspended policy using pol_id
+    // Use find_exact_match_policy function to find pol_id
     function policy_reactivate(
         uint256 pol_id
     )
@@ -163,6 +168,8 @@ contract PolicyManagement {
     }
     
     
+    // Gives policy information using pol_id
+    // To be used using find_match_policy function to iterate over
     function get_policy(
         /**POLICY ID**/
         uint256 pol_id
@@ -175,9 +182,12 @@ contract PolicyManagement {
     }
     
 
+    // Updates already existing policy with new subject/object/action/context arguments
+    // Only updates action and context fields and cannot update subject/object arguments
+    // Note: To make a policy with empty fields for object and subject make new
+    // policy using policy_add function
+    // If policy doesn't exist then emits PolicyNotExist event
     function policy_update(
-        /**POLICY ID**/
-        uint256 pol_id,
         /**SUBJECT ARGUMENTS**/
         string[] memory sub_arg,
         /**OBJECT ARGUMENTS**/
@@ -191,50 +201,27 @@ contract PolicyManagement {
     )
         public
         admin_only()
-        policy_active(pol_id)
     {
-        // Change Subject Info (if string not empty)
-        bytes memory empty_test = bytes(sub_arg[0]);
-        if (empty_test.length != 0) policies[pol_id].subject.name = sub_arg[0];
-        empty_test = bytes(sub_arg[1]);
-        if (empty_test.length != 0) policies[pol_id].subject.organization = sub_arg[1];
-        empty_test = bytes(sub_arg[2]);
-        if (empty_test.length != 0) policies[pol_id].subject.department = sub_arg[2];
-        empty_test = bytes(sub_arg[3]);
-        if (empty_test.length != 0) policies[pol_id].subject.lab = sub_arg[3];
-        empty_test = bytes(sub_arg[4]);
-        if (empty_test.length != 0) policies[pol_id].subject.role = sub_arg[4];
-        empty_test = bytes(sub_arg[5]);
-        if (empty_test.length != 0) policies[pol_id].subject.other = sub_arg[5];
-        // Change Object Info (if string not empty)
-        empty_test = bytes(obj_arg[0]);
-        if (empty_test.length != 0) policies[pol_id].object.name = obj_arg[0];
-        empty_test = bytes(obj_arg[1]);
-        if (empty_test.length != 0) policies[pol_id].object.organization = obj_arg[1];
-        empty_test = bytes(obj_arg[2]);
-        if (empty_test.length != 0) policies[pol_id].object.department = obj_arg[2];
-        empty_test = bytes(obj_arg[3]);
-        if (empty_test.length != 0) policies[pol_id].object.lab = obj_arg[3];
-        empty_test = bytes(obj_arg[4]);
-        if (empty_test.length != 0) policies[pol_id].object.place = obj_arg[4];
-        empty_test = bytes(obj_arg[5]);
-        if (empty_test.length != 0) policies[pol_id].object.other = obj_arg[5];
-        // Change Actions Permitted
-        policies[pol_id].action.read = act_arg[0];
-        policies[pol_id].action.write = act_arg[1];
-        policies[pol_id].action.execute = act_arg[2];
-        // Change Context
-        policies[pol_id].context.mode = con_mode;
-        policies[pol_id].context.start_time = con_arg[0];
-        policies[pol_id].context.end_time = con_arg[1];
+        // Get pol_id from find_exact_match_policy fucntion
+        int pol_id = find_exact_match_policy(sub_arg, obj_arg);
         
-        emit PolicyChanged(pol_id);
+        if (pol_id != -1){
+            require(policies[uint256(pol_id)].state == PolicyState.Active);
+            
+            // Change Actions Permitted
+            policies[uint256(pol_id)].action.read = act_arg[0];
+            policies[uint256(pol_id)].action.write = act_arg[1];
+            policies[uint256(pol_id)].action.execute = act_arg[2];
+            // Change Context
+            policies[uint256(pol_id)].context.mode = con_mode;
+            policies[uint256(pol_id)].context.start_time = con_arg[0];
+            policies[uint256(pol_id)].context.end_time = con_arg[1];
+            
+            emit PolicyChanged(uint256(pol_id));
+        } else {
+            emit PolicyNotExist(sub_arg, obj_arg);
+        }
     }
-    
-    
-    // function get_bytes(string memory word) pure public returns (bytes memory){
-    //     return bytes(word);
-    // }
 
 
     // This Function checks every policy in the policies list/array and returns the first
