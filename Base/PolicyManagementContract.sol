@@ -342,6 +342,9 @@ contract PolicyManagement {
     }
     
     
+    // Function to get the ret_list to see which policies are similar
+    // to last query
+    // Returns empty list if query resulted in no matches
     function get_ret_list ()
         view
         public

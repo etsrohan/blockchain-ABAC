@@ -46,9 +46,12 @@ contract ObjectAttribute {
         admin = msg.sender;
     }
 
+    // Adds Object with given attributes:
+    // name, organization, department, lab, place, other
+    // Emits NewObjectAdded event with obj_id
     function object_add(
+        /**ATTRIBUTES LIST**/
         string[] memory obj_arg
-        /*ADD ARGUMENTS*/
     )
         public
         admin_only()
@@ -63,8 +66,11 @@ contract ObjectAttribute {
         objects[obj_id].lab = obj_arg[3];
         objects[obj_id].place = obj_arg[4];
         objects[obj_id].other = obj_arg[5];
+        emit NewObjectAdded(obj_id);
     }
 
+    // Sets object to "deactivated" mode
+    // Cannot reactivate once deleted
     function delete_object(
         uint256 obj_id
     )
@@ -75,6 +81,8 @@ contract ObjectAttribute {
         objects[obj_id].state = ObjectState.Deactivated;
     }
 
+    // Sets object to "suspended" mode
+    // Use reactivate_object function to reactivate object
     function suspend_object(
         uint256 obj_id
     )
@@ -84,7 +92,23 @@ contract ObjectAttribute {
     {
         objects[obj_id].state = ObjectState.Suspended;
     }
+    
+    // Sets object to "active" mode
+    // Cannot be used if object is "deactivated"
+    function reactivate_object(
+        uint256 obj_id
+    )
+        public
+        admin_only()
+        obj_not_deactivated(obj_id)
+    {
+        objects[obj_id].state = ObjectState.Active;
+    }
 
+    // Changes the attributes of a object
+    // If attribute are blank "" skip to next attribute (no change done)
+    // Note: Cannot set any attribute to empty string (blank)
+    // Emits ObjectChanged event
     function change_attribs(
         uint256 obj_id,
         string[] memory obj_arg

@@ -46,6 +46,9 @@ contract SubjectAttribute {
         admin = msg.sender;
     }
     
+    // Adds a new subject with given attributes:
+    // name, organization, department, lab, role, other
+    // Emits NewSubjectAdded event with the sub_id
     function subject_add(
         /**ARGUMENTS LIST**/
         string[] memory sub_arg
@@ -66,6 +69,8 @@ contract SubjectAttribute {
         emit NewSubjectAdded(sub_id);
     }
 
+    // Sets subject to "deactivated" mode
+    // Cannot reactivate once deleted
     function delete_subject(
         uint256 sub_id
     )
@@ -76,6 +81,8 @@ contract SubjectAttribute {
         subjects[sub_id].state = SubjectState.Deactivated;
     }
 
+    // Sets subject to "suspended" mode
+    // Use reactivate_subject function to reactivate subject
     function suspend_subject(
         uint256 sub_id
     )
@@ -85,7 +92,23 @@ contract SubjectAttribute {
     {
         subjects[sub_id].state = SubjectState.Suspended;
     }
+    
+    // Sets subject to "active" mode
+    // Cannot be used if subject is "deactivated"
+    function reactivate_subject(
+        uint256 sub_id
+    )
+        public
+        admin_only()
+        sub_not_deactivated(sub_id)
+    {
+        subjects[sub_id].state = SubjectState.Active;
+    }
 
+    // Changes the attributes of a subject
+    // If attribute are blank "" skip to next attribute (no change done)
+    // Note: Cannot set any attribute to empty string (blank)
+    // Emits SubjectChanged event
     function change_attribs(
         uint256 sub_id,
         string[] memory sub_arg
