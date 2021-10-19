@@ -50,9 +50,10 @@ contract ObjectAttribute {
     // name, organization, department, lab, place, other
     // Emits NewObjectAdded event with obj_id
     function object_add(
-        /**ATTRIBUTES LIST**/
+        /**OBJECT ATTRIBUTES**/
         string[] memory obj_arg
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -72,8 +73,10 @@ contract ObjectAttribute {
     // Sets object to "deactivated" mode
     // Cannot reactivate once deleted
     function delete_object(
+        /**OBJECT ID**/
         uint256 obj_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         obj_not_deactivated(obj_id)
@@ -84,8 +87,10 @@ contract ObjectAttribute {
     // Sets object to "suspended" mode
     // Use reactivate_object function to reactivate object
     function suspend_object(
+        /**OBJECT ID**/
         uint256 obj_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         obj_not_deactivated(obj_id)
@@ -96,8 +101,10 @@ contract ObjectAttribute {
     // Sets object to "active" mode
     // Cannot be used if object is "deactivated"
     function reactivate_object(
+        /**OBJECT ID**/
         uint256 obj_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         obj_not_deactivated(obj_id)
@@ -110,9 +117,12 @@ contract ObjectAttribute {
     // Note: Cannot set any attribute to empty string (blank)
     // Emits ObjectChanged event
     function change_attribs(
+        /**OBJECT ID**/
         uint256 obj_id,
+        /**OBJECT ATTRIBUTES**/
         string[] memory obj_arg
     )
+        /**MODIFIERS**/
         public
         admin_only()
         obj_active(obj_id)

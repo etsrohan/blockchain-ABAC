@@ -95,6 +95,7 @@ contract PolicyManagement {
         uint8 con_mode,
         uint256[] memory con_time
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -126,6 +127,7 @@ contract PolicyManagement {
         /**OBJECT ARGUMENTS**/
         string[] memory obj_arg
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -148,8 +150,10 @@ contract PolicyManagement {
     // Suspends a given policy using pol_id
     // Use find_exact_match_policy function to find pol_id
     function policy_suspend(
+        /**POLICY ID**/
         uint256 pol_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -159,8 +163,10 @@ contract PolicyManagement {
     // Reactivates an already suspended policy using pol_id
     // Use find_exact_match_policy function to find pol_id
     function policy_reactivate(
+        /**POLICY ID**/
         uint256 pol_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -174,6 +180,7 @@ contract PolicyManagement {
         /**POLICY ID**/
         uint256 pol_id
     )
+        /**MODIFIERS**/
         view
         public
         returns (Policy memory)
@@ -197,8 +204,8 @@ contract PolicyManagement {
         /**CONTEXT ARGUMENTS**/
         uint8 con_mode,
         uint256[] memory con_arg
-
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -233,6 +240,7 @@ contract PolicyManagement {
         /**OBJECT ARGUMENTS**/
         string[] memory obj_arg
     )
+        /**MODIFIERS**/
         view
         public /**LATER CHANGE TO INTERNAL**/
         returns (int)
@@ -272,6 +280,7 @@ contract PolicyManagement {
         /**OBJECT ARGUMENTS**/
         string[] memory obj_arg
     )
+        /**MODIFIERS**/
         public /**LATER CHANGE TO INTERNAL**/
     {
         uint256 count;
@@ -345,7 +354,8 @@ contract PolicyManagement {
     // Function to get the ret_list to see which policies are similar
     // to last query
     // Returns empty list if query resulted in no matches
-    function get_ret_list ()
+    function get_ret_list (/**NO ARGS**/)
+        /**MODIFIERS**/
         view
         public
         returns (uint256[] memory)

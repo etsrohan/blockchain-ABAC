@@ -50,9 +50,10 @@ contract SubjectAttribute {
     // name, organization, department, lab, role, other
     // Emits NewSubjectAdded event with the sub_id
     function subject_add(
-        /**ARGUMENTS LIST**/
+        /**SUBJECT ATTRIBUTES**/
         string[] memory sub_arg
     )
+        /**MODIFIERS**/
         public
         admin_only()
     {
@@ -72,8 +73,10 @@ contract SubjectAttribute {
     // Sets subject to "deactivated" mode
     // Cannot reactivate once deleted
     function delete_subject(
+        /**SUBJECT ID**/
         uint256 sub_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         sub_not_deactivated(sub_id)
@@ -84,8 +87,10 @@ contract SubjectAttribute {
     // Sets subject to "suspended" mode
     // Use reactivate_subject function to reactivate subject
     function suspend_subject(
+        /**SUBJECT ID**/
         uint256 sub_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         sub_not_deactivated(sub_id)
@@ -96,8 +101,10 @@ contract SubjectAttribute {
     // Sets subject to "active" mode
     // Cannot be used if subject is "deactivated"
     function reactivate_subject(
+        /**SUBJECT ID**/
         uint256 sub_id
     )
+        /**MODIFIERS**/
         public
         admin_only()
         sub_not_deactivated(sub_id)
@@ -110,9 +117,12 @@ contract SubjectAttribute {
     // Note: Cannot set any attribute to empty string (blank)
     // Emits SubjectChanged event
     function change_attribs(
+        /**SUBJECT ID**/
         uint256 sub_id,
+        /**SUBJECT ATTRIBUTES**/
         string[] memory sub_arg
     )
+        /**MODIFIERS**/
         public
         admin_only()
         sub_active(sub_id)
