@@ -73,20 +73,50 @@ contract AccessControl {
     )
         /**MODIFIERS**/
         public
-        view
         returns (bool)
     {
         // Subject Information
         SubjectAttribute subject_contract = SubjectAttribute(subject_address);
         SubjectAttribute.SubjectState sub_state;
         Store memory sub_arg;
-        (sub_state, sub_arg.name, sub_arg.organization, sub_arg.department, sub_arg.lab, sub_arg.role_place, sub_arg.other) = subject_contract.subjects(sub_id);
+        (sub_state,
+         sub_arg.name,
+         sub_arg.organization,
+         sub_arg.department,
+         sub_arg.lab,
+         sub_arg.role_place,
+         sub_arg.other)
+         = subject_contract.subjects(sub_id);
 
         // Object Information
         ObjectAttribute object_contract = ObjectAttribute(object_address);
         ObjectAttribute.ObjectState obj_state;
         Store memory obj_arg;
-        (obj_state, obj_arg.name, obj_arg.organization, obj_arg.department, obj_arg.lab, obj_arg.role_place, obj_arg.other) = object_contract.objects(obj_id);
+        (obj_state,
+         obj_arg.name,
+         obj_arg.organization,
+         obj_arg.department,
+         obj_arg.lab,
+         obj_arg.role_place,
+         obj_arg.other)
+         = object_contract.objects(obj_id);
+        
+        // Send Subject and Object info to Policy Management contract
+        PolicyManagement policy_contract = PolicyManagement(policy_address);
+        policy_contract.find_match_policy([sub_arg.name,
+                                           sub_arg.organization,
+                                           sub_arg.department,
+                                           sub_arg.lab,
+                                           sub_arg.role_place,
+                                           sub_arg.other],
+                                          [obj_arg.name,
+                                           obj_arg.organization,
+                                           obj_arg.department,
+                                           obj_arg.lab,
+                                           obj_arg.role_place,
+                                           obj_arg.other]);
+
+        uint256[] memory ret_list = policy_contract.get_ret_list();
 
         return true;
     }

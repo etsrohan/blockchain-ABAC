@@ -51,7 +51,7 @@ contract SubjectAttribute {
     // Emits NewSubjectAdded event with the sub_id
     function subject_add(
         /**SUBJECT ATTRIBUTES**/
-        string[] memory sub_arg
+        string[6] memory sub_arg
     )
         /**MODIFIERS**/
         public
@@ -120,7 +120,7 @@ contract SubjectAttribute {
         /**SUBJECT ID**/
         uint256 sub_id,
         /**SUBJECT ATTRIBUTES**/
-        string[] memory sub_arg
+        string[6] memory sub_arg
     )
         /**MODIFIERS**/
         public

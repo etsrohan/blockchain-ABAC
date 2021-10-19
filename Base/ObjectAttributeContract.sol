@@ -51,7 +51,7 @@ contract ObjectAttribute {
     // Emits NewObjectAdded event with obj_id
     function object_add(
         /**OBJECT ATTRIBUTES**/
-        string[] memory obj_arg
+        string[6] memory obj_arg
     )
         /**MODIFIERS**/
         public
@@ -120,7 +120,7 @@ contract ObjectAttribute {
         /**OBJECT ID**/
         uint256 obj_id,
         /**OBJECT ATTRIBUTES**/
-        string[] memory obj_arg
+        string[6] memory obj_arg
     )
         /**MODIFIERS**/
         public

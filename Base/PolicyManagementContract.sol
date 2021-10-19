@@ -55,10 +55,10 @@ contract PolicyManagement {
 
     // EVENTS
     event PolicyAdded(uint256 pol_id);
-    event DuplicatePolicyExist(string[] subject, string[] object);
+    event DuplicatePolicyExist(string[6] subject, string[6] object);
     event PolicyChanged(uint256 pol_id);
     event PolicyDeleted(uint256 pol_id);
-    event PolicyNotExist(string[] subject, string[] object);
+    event PolicyNotExist(string[6] subject, string[6] object);
 
     // MODIFIERS
     modifier admin_only(){
@@ -86,14 +86,14 @@ contract PolicyManagement {
     // If policy already exists then emits DuplicatePolicyExist event
     function policy_add(
         /**SUBJECT ARGUMENTS**/
-        string[] memory sub_arg,
+        string[6] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        string[] memory obj_arg,
+        string[6] memory obj_arg,
         /**ACTION ARGUMENTS**/
-        bool[] memory act_arg,
+        bool[3] memory act_arg,
         /**CONTEXT ARGUMENTS**/
         uint8 con_mode,
-        uint256[] memory con_time
+        uint256[2] memory con_time
     )
         /**MODIFIERS**/
         public
@@ -123,9 +123,9 @@ contract PolicyManagement {
     // If no policy found then emits PolicyNotExist event
     function policy_delete(
         /**SUBJECT ARGUMENTS**/
-        string[] memory sub_arg,
+        string[6] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        string[] memory obj_arg
+        string[6] memory obj_arg
     )
         /**MODIFIERS**/
         public
@@ -196,14 +196,14 @@ contract PolicyManagement {
     // If policy doesn't exist then emits PolicyNotExist event
     function policy_update(
         /**SUBJECT ARGUMENTS**/
-        string[] memory sub_arg,
+        string[6] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        string[] memory obj_arg,
+        string[6] memory obj_arg,
         /**ACTION ARGUMENTS**/
-        bool[] memory act_arg,
+        bool[3] memory act_arg,
         /**CONTEXT ARGUMENTS**/
         uint8 con_mode,
-        uint256[] memory con_arg
+        uint256[2] memory con_arg
     )
         /**MODIFIERS**/
         public
@@ -236,9 +236,9 @@ contract PolicyManagement {
     // ELSE: it returns -1 if none were found
     function find_exact_match_policy (
         /**SUBJECT ARGUMENTS**/
-        string[] memory sub_arg,
+        string[6] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        string[] memory obj_arg
+        string[6] memory obj_arg
     )
         /**MODIFIERS**/
         view
@@ -276,12 +276,12 @@ contract PolicyManagement {
     // returns empty list if no matches were found.
     function find_match_policy(
         /**SUBJECT ARGUMENTS**/
-        string[] memory sub_arg,
+        string[6] memory sub_arg,
         /**OBJECT ARGUMENTS**/
-        string[] memory obj_arg
+        string[6] memory obj_arg
     )
         /**MODIFIERS**/
-        public /**LATER CHANGE TO INTERNAL**/
+        public
     {
         uint256 count;
         uint256 i;
