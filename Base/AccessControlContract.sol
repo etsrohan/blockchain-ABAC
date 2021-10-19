@@ -6,6 +6,16 @@ import 'SubjectAttributeContract.sol';
 import 'ObjectAttributeContract.sol';
 
 contract AccessControl {
+    // STRUCTS
+    struct Store {
+        string name;
+        string organization;
+        string department;
+        string lab;
+        string role_place;
+        string other;
+    }
+
     // VARIABLES
     address policy_address;
     address subject_address;
@@ -69,14 +79,14 @@ contract AccessControl {
         // Subject Information
         SubjectAttribute subject_contract = SubjectAttribute(subject_address);
         SubjectAttribute.SubjectState sub_state;
-        string[] memory sub_arg;
-        (sub_state, sub_arg[0], sub_arg[1], sub_arg[2], sub_arg[3], sub_arg[4], sub_arg[5]) = subject_contract.subjects(sub_id);
+        Store memory sub_arg;
+        (sub_state, sub_arg.name, sub_arg.organization, sub_arg.department, sub_arg.lab, sub_arg.role_place, sub_arg.other) = subject_contract.subjects(sub_id);
 
         // Object Information
         ObjectAttribute object_contract = ObjectAttribute(object_address);
         ObjectAttribute.ObjectState obj_state;
-        string[] memory obj_arg;
-        (obj_state, obj_arg[0], obj_arg[1], obj_arg[2], obj_arg[3], obj_arg[4], obj_arg[5]) = object_contract.objects(obj_id);
+        Store memory obj_arg;
+        (obj_state, obj_arg.name, obj_arg.organization, obj_arg.department, obj_arg.lab, obj_arg.role_place, obj_arg.other) = object_contract.objects(obj_id);
 
         return true;
     }
