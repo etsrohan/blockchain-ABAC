@@ -362,4 +362,52 @@ contract PolicyManagement {
     {
         return ret_list;
     }
+
+
+    // Function that takes ret_list (access_list), action, and time_stamp (add later)
+    // and returns a boolean for access control
+    // true: access granted, false: access denied
+    function get_access (
+        /**ARGUMENTS**/
+        uint256[] memory access_list,
+        uint8 action
+    )
+        external
+        view
+        returns (bool)
+    {
+        // Check to see if access list is empty
+        if (access_list.length == 0){
+            return false;
+        }
+
+        // Set read/write/execute to true if any policy in access_list allows to do so
+        bool read = false;
+        bool write = false;
+        bool execute = false;
+        for (uint256 i = 0; i < access_list.length; i++){
+            if (policies[access_list[i]].action.read){
+                read = true;
+            }
+            if (policies[access_list[i]].action.write){
+                write = true;
+            }
+            if (policies[access_list[i]].action.execute){
+                execute = true;
+            }
+        }
+
+        // Action: 0 = read, 1 = write, 2 = execute, 3 = read & write
+        if (action == 0 && read) {
+            return true;
+        } else if (action == 1 && write) {
+            return true;
+        } else if (action == 2 && execute) {
+            return true;
+        } else if (action == 3 && read && write) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

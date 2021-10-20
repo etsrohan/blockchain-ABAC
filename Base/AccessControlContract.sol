@@ -23,6 +23,8 @@ contract AccessControl {
     address admin;
 
     // EVENTS
+    event AccessGranted (uint256 sub_id, uint256 obj_id, uint8 action);
+    event AccessDenied (uint256 sub_id, uint256 obj_id, uint8 action);
 
     // MODIFIERS
     modifier admin_only(){
@@ -73,7 +75,6 @@ contract AccessControl {
     )
         /**MODIFIERS**/
         public
-        returns (bool)
     {
         // Subject Information
         SubjectAttribute subject_contract = SubjectAttribute(subject_address);
@@ -118,6 +119,12 @@ contract AccessControl {
 
         uint256[] memory ret_list = policy_contract.get_ret_list();
 
-        return true;
+        bool access = policy_contract.get_access(ret_list, action);
+
+        if (access) {
+            emit AccessGranted(sub_id, obj_id, action);
+        } else {
+            emit AccessDenied(sub_id, obj_id, action);
+        }
     }
 }
