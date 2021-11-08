@@ -103,6 +103,7 @@ contract AccessControl {
          = object_contract.objects(obj_id);
         
         // Send Subject and Object info to Policy Management contract
+        // and get list of policies relating to Subject and Object
         PolicyManagement policy_contract = PolicyManagement(policy_address);
         policy_contract.find_match_policy([sub_arg.name,
                                            sub_arg.organization,
@@ -119,8 +120,12 @@ contract AccessControl {
 
         uint256[] memory ret_list = policy_contract.get_ret_list();
 
+        // Function call to check action against list of policies
+        // and return yes/no access variable
         bool access = policy_contract.get_access(ret_list, action);
 
+        // Emit AccessGranted or AccessDenied events if subject has 
+        // access to that object
         if (access) {
             emit AccessGranted(sub_id, obj_id, action);
         } else {

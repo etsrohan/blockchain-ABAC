@@ -386,14 +386,19 @@ contract PolicyManagement {
         bool write = false;
         bool execute = false;
         for (uint256 i = 0; i < access_list.length; i++){
-            if (policies[access_list[i]].action.read){
-                read = true;
-            }
-            if (policies[access_list[i]].action.write){
-                write = true;
-            }
-            if (policies[access_list[i]].action.execute){
-                execute = true;
+            if (policies[access_list[i]].context.mode == 0 || 
+                (policies[access_list[i]].context.mode == 0 &&
+                block.timestamp > policies[access_list[i]].context.start_time &&
+                block.timestamp < policies[access_list[i]].context.end_time)){
+                if (policies[access_list[i]].action.read){
+                    read = true;
+                }
+                if (policies[access_list[i]].action.write){
+                    write = true;
+                }
+                if (policies[access_list[i]].action.execute){
+                    execute = true;
+                }
             }
         }
 
