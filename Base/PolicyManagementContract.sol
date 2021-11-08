@@ -387,7 +387,7 @@ contract PolicyManagement {
         bool execute = false;
         for (uint256 i = 0; i < access_list.length; i++){
             if (policies[access_list[i]].context.mode == 0 || 
-                (policies[access_list[i]].context.mode == 0 &&
+                (policies[access_list[i]].context.mode == 1 &&
                 block.timestamp > policies[access_list[i]].context.start_time &&
                 block.timestamp < policies[access_list[i]].context.end_time)){
                 if (policies[access_list[i]].action.read){
