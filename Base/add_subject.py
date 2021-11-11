@@ -29,7 +29,7 @@ subject_contract = w3.eth.contract(
 # --------------------------MAIN PROGRAM----------------------------
 
 # Try sending add subject transaction
-tx_hash = subject_contract.functions.subject_add(['Rando', 'NexG', 'Blockchain', 'Main', 'IE', '']).transact()
+tx_hash = subject_contract.functions.subject_add(['Rohan', 'NexG', 'Blockchain', 'Main', 'IE', '']).transact()
 tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
 print(subject_contract.functions.subjects(0).call())

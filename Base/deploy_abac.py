@@ -1,3 +1,4 @@
+# Import Modules and Functions
 from eth_typing.ethpm import ContractName
 from solcx import compile_files, compile_source
 import os
@@ -54,10 +55,10 @@ for name in compiled_sol.keys():
     # Store the Bytecode in BYTECODE List
     BYTECODE.append(bytecode)
     
-    # Create the Subject Contract
-    SubjectContract = w3.eth.contract(abi = abi, bytecode = bytecode)
+    # Create the Contract
+    Contract = w3.eth.contract(abi = abi, bytecode = bytecode)
     # submit transaction that deploys the contract
-    tx_hash = SubjectContract.constructor().transact()
+    tx_hash = Contract.constructor().transact()
     # wait for the transaction to be mined and get the transaction receipt
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     
@@ -78,11 +79,53 @@ BYTECODE = tuple(BYTECODE)
 CONTRACT_ADDRESS = tuple(CONTRACT_ADDRESS)
 
 for index in range(3):
-    print(f'[SAVING] {CONTRACT_NAME[index]}')
-    with open(f'{CONTRACT_NAME[index]}.contract', 'w') as file_object:
+    if 'Object' in CONTRACT_NAME[index]:
+        name = 'ObjectAttribute'
+    elif 'Subject' in CONTRACT_NAME[index]:
+        name  = 'SubjectAttribute'
+    elif 'Policy' in CONTRACT_NAME[index]:
+        name = 'PolicyManagement'
+    else:
+        print(f'[ERROR] {CONTRACT_NAME[index]} name unknown...')
+        continue
+    
+    print(f'[SAVING] {name}')
+    with open(f'{name}.contract', 'w') as file_object:
         file_object.write(CONTRACT_ADDRESS[index])
         file_object.write('\n')
         file_object.write(json.dumps(ABI[index]))
-    print(f'[SUCCESS]{CONTRACT_NAME[index]} Information Saved...\n')
+    print(f'[SUCCESS]{name} Information Saved...\n')
 
 # Deploy Access Control Contract
+# Getting the Dictionary key for access control
+for name in compiled_sol.keys():
+    if 'AccessControl' in name:
+        contract_name = name
+        break
+
+# Getting abi and bytecode for access control
+access_abi = compiled_sol[name]['abi']
+access_bytecode = compiled_sol[name]['bin']
+print(f'[DEPLOYING] Deploying Access Control Contract...')
+
+# Creating the access control contract
+Access_Contract = w3.eth.contract(abi = access_abi,
+                                  bytecode = access_bytecode)
+# Transact the constructor
+tx_hash = Access_Contract.constructor(CONTRACT_ADDRESS[1], CONTRACT_ADDRESS[2], CONTRACT_ADDRESS[0]).transact()
+# wait for the transaction to be mined and get the transaction receipt
+tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+access_contract = w3.eth.contract(
+    address = tx_receipt.contractAddress,
+    abi = abi
+)
+print(f"[SUCCESS] Access Control Contract Successfully Deployed!!!")
+print(f"[INFO] Contract Address: {tx_receipt.contractAddress}\n")
+
+print(f'[SAVING] AccessControl')
+with open('AccessControl.contract', 'w') as file_object:
+    file_object.write(CONTRACT_ADDRESS[index])
+    file_object.write('\n')
+    file_object.write(json.dumps(ABI[index]))
+print(f'[SUCCESS] AccessControl Information Saved...\n')
