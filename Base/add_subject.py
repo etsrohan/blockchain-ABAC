@@ -1,6 +1,7 @@
 # Import Modules/Functions
 from web3 import Web3
 import threading
+import json
 
 # Connect to Ganache
 GANACHE_URL = 'HTTP://127.0.0.1:7545'
@@ -19,7 +20,7 @@ with open('SubjectAttribute.contract', 'r') as file_obj:
 # Gives a list of adderss and abi
 # Get address/abi for subject contract
 subject_address = subject_info[0][:-1]
-subject_abi = subject_info[1]
+subject_abi = json.loads(subject_info[1])
 
 # Connecting to subject contract
 subject_contract = w3.eth.contract(
@@ -33,6 +34,10 @@ subject_contract = w3.eth.contract(
 
 # Send subject function to send subject_add transaction
 def send_subject(subject):
+    """
+    Function which is used as a target for threading to send
+    transactions to add new subjects to SubjectAttributeContract
+    """
     tx_hash = subject_contract.functions.subject_add(subject.split(';')).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f"[SUCCESS] Added subject {subject.split(';')[0]}")

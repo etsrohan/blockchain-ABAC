@@ -37,7 +37,7 @@ contract SubjectAttribute {
     }
 
     // EVENTS
-    event NewSubjectAdded(uint256 sub_id);
+    event NewSubjectAdded(uint256 sub_id, string name);
     event SubjectChanged(uint256 sub_id);
 
     // FUNCTIONS
@@ -67,7 +67,7 @@ contract SubjectAttribute {
         subjects[sub_id].lab = sub_arg[3];
         subjects[sub_id].role = sub_arg[4];
         subjects[sub_id].other = sub_arg[5];
-        emit NewSubjectAdded(sub_id);
+        emit NewSubjectAdded(sub_id, subjects[sub_id].name);
     }
 
     // Sets subject to "deactivated" mode

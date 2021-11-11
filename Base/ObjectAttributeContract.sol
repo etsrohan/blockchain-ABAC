@@ -37,7 +37,7 @@ contract ObjectAttribute {
     }
 
     // EVENTS
-    event NewObjectAdded(uint256 obj_id);
+    event NewObjectAdded(uint256 obj_id, string name);
     event ObjectChanged(uint256 obj_id);
 
     // FUNCTIONS
@@ -67,7 +67,7 @@ contract ObjectAttribute {
         objects[obj_id].lab = obj_arg[3];
         objects[obj_id].place = obj_arg[4];
         objects[obj_id].other = obj_arg[5];
-        emit NewObjectAdded(obj_id);
+        emit NewObjectAdded(obj_id, objects[obj_id].name);
     }
 
     // Sets object to "deactivated" mode

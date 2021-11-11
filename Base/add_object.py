@@ -1,6 +1,7 @@
 # Import Modules/Functions
 from web3 import Web3
 import threading
+import json
 
 # Connect to Ganache
 GANACHE_URL = 'HTTP://127.0.0.1:7545'
@@ -19,7 +20,7 @@ with open('ObjectAttribute.contract', 'r') as file_obj:
 # Gives a list of adderss and abi
 # Get address/abi for object contract
 object_address = object_info[0][:-1]
-object_abi = object_info[1]
+object_abi = json.loads(object_info[1])
 
 # Connecting to object contract
 object_contract = w3.eth.contract(
@@ -33,6 +34,10 @@ object_contract = w3.eth.contract(
 
 # Send object function to send object_add transaction
 def send_object(object):
+    """
+    Function which is used as a target for threading to send
+    transactions to add new objects to ObjectAttributeContract
+    """
     tx_hash = object_contract.functions.object_add(object.split(';')).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f"[SUCCESS] Added object {object.split(';')[0]}")
@@ -52,7 +57,7 @@ for object in sub_info:
         target = send_object,
         args = (object,)
     )
-    # Add thread to threads list 
+    # Add thread to threads list
     threads.append(thread)
 # Start the threads in threads list
 for thread in threads:
