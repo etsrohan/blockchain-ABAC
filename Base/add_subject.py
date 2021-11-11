@@ -1,5 +1,6 @@
 # Import Modules/Functions
 from web3 import Web3
+import threading
 
 # Connect to Ganache
 GANACHE_URL = 'HTTP://127.0.0.1:7545'
@@ -27,10 +28,39 @@ subject_contract = w3.eth.contract(
 )
 
 # --------------------------MAIN PROGRAM----------------------------
+# Subject Attributes:
+#   Name, Organization, Department, Lab, Role , Other
 
-# Try sending add subject transaction
-tx_hash = subject_contract.functions.subject_add(['Rohan', 'NexG', 'Blockchain', 'Main', 'IE', '']).transact()
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+# Send subject function to send subject_add transaction
+def send_subject(subject):
+    tx_hash = subject_contract.functions.subject_add(subject.split(';')).transact()
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    print(f"[SUCCESS] Added subject {subject.split(';')[0]}")
 
-print(subject_contract.functions.subjects(0).call())
-print('[SUCCESS] Transaction Successful')
+# Get subjects data from subjects.txt
+with open('subjects.txt', 'r') as file_obj:
+    sub_info = file_obj.readlines()
+
+# For every subject in sub_info send subject_add transaction 
+threads = []
+for subject in sub_info:
+    # Remove \n at the end of each string if it exists
+    if subject[-1] == '\n':
+        subject = subject[:-1]
+    # Create a new thread for every subject
+    thread = threading.Thread(
+        target = send_subject,
+        args = (subject,)
+    )
+    # Add thread to threads list 
+    threads.append(thread)
+# Start the threads in threads list
+for thread in threads:
+    thread.start()
+# Wait for threads to finish before calling subjects
+for thread in threads:
+    thread.join()
+# Call subjects abi to confirm that every subject was added successfully.
+for i in range(len(sub_info)):
+    print('Subject:\n\t', subject_contract.functions.subjects(i).call())
+print('\n[ADD SUBJECTS][SUCCESS] Transactions Successful\n')

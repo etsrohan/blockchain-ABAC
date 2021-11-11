@@ -1,36 +1,7 @@
-# Import Modules/Functions
-from web3 import Web3
+with open('subjects.txt', 'r') as file_obj:
+    sub_info = file_obj.readlines()
 
-# Connect to Ganache
-GANACHE_URL = 'HTTP://127.0.0.1:7545'
-w3 = Web3(Web3.HTTPProvider(GANACHE_URL))
-
-if w3.isConnected():
-    print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
-
-# set first account as default user or "Administrator"
-w3.eth.default_account = w3.eth.accounts[0]
-
-with open('SubjectAttribute.contract', 'r') as file_obj:
-    subject_info = file_obj.readlines()
-
-# print(subject_info)
-# Gives a list of adderss and abi
-# Get address/abi for subject contract
-subject_address = subject_info[0][:-1]
-subject_abi = subject_info[1]
-
-# Connecting to subject contract
-subject_contract = w3.eth.contract(
-    address = subject_address,
-    abi = subject_abi
-)
-
-# --------------------------MAIN PROGRAM----------------------------
-
-# Try sending add subject transaction
-tx_hash = subject_contract.functions.subject_add(['Rando', 'NexG', 'Blockchain', 'Main', 'IE', '']).transact()
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-print(subject_contract.functions.subjects(0).call())
-print('[SUCCESS] Transaction Successful')
+for n in range(len(sub_info)):
+    if sub_info[n][-1] == '\n':
+        sub_info[n] = sub_info[n][:-1]
+    print(sub_info[n].split(';'))
