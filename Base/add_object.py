@@ -44,18 +44,18 @@ def send_object(object):
 
 # Get objects data from objects.txt
 with open('objects.txt', 'r') as file_obj:
-    sub_info = file_obj.readlines()
+    obj_info = file_obj.readlines()
 
-# For every object in sub_info send object_add transaction 
+# For every object in obj_info send object_add transaction 
 threads = []
-for object in sub_info:
+for obj in obj_info:
     # Remove \n at the end of each string if it exists
-    if object[-1] == '\n':
-        object = object[:-1]
+    if obj[-1] == '\n':
+        obj = obj[:-1]
     # Create a new thread for every object
     thread = threading.Thread(
         target = send_object,
-        args = (object,)
+        args = (obj,)
     )
     # Add thread to threads list
     threads.append(thread)
@@ -66,6 +66,6 @@ for thread in threads:
 for thread in threads:
     thread.join()
 # Call objects abi to confirm that every object was added successfully.
-for i in range(len(sub_info)):
+for i in range(len(obj_info)):
     print('Object:\n\t', object_contract.functions.objects(i).call())
 print('\n[ADD OBJECTS][SUCCESS] Transactions Successful\n')

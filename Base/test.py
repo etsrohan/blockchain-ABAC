@@ -1,7 +1,11 @@
-with open('subjects.txt', 'r') as file_obj:
-    sub_info = file_obj.readlines()
+s = ';NexG;;Manager;;:;;;;;:true;true;true:0:0;0'
 
-for n in range(len(sub_info)):
-    if sub_info[n][-1] == '\n':
-        sub_info[n] = sub_info[n][:-1]
-    print(sub_info[n].split(';'))
+
+s = s.split(':')
+print(s)
+for i in range(5):
+    if i == 3:
+        continue
+    s[i] = s[i].split(';')
+    
+print(s)
