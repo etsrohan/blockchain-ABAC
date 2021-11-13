@@ -14,15 +14,15 @@ if w3.isConnected():
 w3.eth.default_account = w3.eth.accounts[0]
 
 with open('PolicyManagement.contract', 'r') as file_obj:
-    object_info = file_obj.readlines()
+    policy_info = file_obj.readlines()
 
-# print(object_info)
+# print(policy_info)
 # Gives a list of adderss and abi
-# Get address/abi for object contract
-policy_address = object_info[0][:-1]
-policy_abi = json.loads(object_info[1])
+# Get address/abi for policy contract
+policy_address = policy_info[0][:-1]
+policy_abi = json.loads(policy_info[1])
 
-# Connecting to object contract
+# Connecting to policy contract
 policy_contract = w3.eth.contract(
     address = policy_address,
     abi = policy_abi
@@ -75,18 +75,17 @@ def send_policy(policy):
           \r\t{policy[3]}\n
           \r\t{policy[4]}\n""")
     
-
 # Get policies from policies.txt
 with open('policies.txt', 'r') as file_obj:
     policy_info = file_obj.readlines()
 
-# For every policy in policy_info send object_add transaction 
+# For every policy in policy_info send policy_add transaction 
 threads = []
 for policy in policy_info:
     # If policy line ends with \n then remove it
     if policy[-1] == '\n':
         policy = policy[:-1]
-    # Create a new thread for every object
+    # Create a new thread for every policy
     thread = threading.Thread(
         target = send_policy,
         args = (policy,)
@@ -96,10 +95,10 @@ for policy in policy_info:
 # Start every thread of send_policy
 for thread in threads:
     thread.start()
-# Wait for threads to finish before calling objects
+# Wait for threads to finish before calling get_policy
 for thread in threads:
     thread.join()
-# Call objects abi to confirm that every object was added successfully.
+# Call get_policy abi to confirm that every policy was added successfully.
 for i in range(len(policy_info)):
     print('Policy:\n\t', policy_contract.functions.get_policy(i).call())
 print('\n[ADD POLICY][SUCCESS] Transactions Successful\n')

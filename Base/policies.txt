@@ -2,4 +2,4 @@
 ;NexG;Network;;;:;NexG;Network;;;:true;true;false:0:0;0
 ;NexG;Android;;;:;NexG;Android;;;:true;true;false:0:0;0
 ;NexG;Database;;;:;NexG;Database;;;:true;true;false:0:0;0
-;NexG;;Manager;;:;;;;;:true;true;true:0:0;0
+;NexG;;;Manager;:;NexG;;;;:true;true;true:0:0;0

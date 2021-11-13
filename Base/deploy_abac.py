@@ -118,14 +118,14 @@ tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
 access_contract = w3.eth.contract(
     address = tx_receipt.contractAddress,
-    abi = abi
+    abi = access_abi
 )
 print(f"[SUCCESS] Access Control Contract Successfully Deployed!!!")
 print(f"[INFO] Contract Address: {tx_receipt.contractAddress}\n")
 
 print(f'[SAVING] AccessControl')
 with open('AccessControl.contract', 'w') as file_object:
-    file_object.write(CONTRACT_ADDRESS[index])
+    file_object.write(tx_receipt.contractAddress)
     file_object.write('\n')
-    file_object.write(json.dumps(ABI[index]))
+    file_object.write(json.dumps(access_abi))
 print(f'[SUCCESS] AccessControl Information Saved...\n')

@@ -28,6 +28,20 @@ with open('SubjectAttribute.contract', 'r') as file_obj:
 subject_address = subject_info[0][:-1]
 subject_abi = json.loads(subject_info[1])
 
+# Open and get Policy ABI/Address
+with open('PolicyManagement.contract', 'r') as file_obj:
+    policy_info = file_obj.readlines()
+# Get address/abi for policy contract
+policy_address = policy_info[0][:-1]
+policy_abi = json.loads(policy_info[1])
+
+# Open and get Access ABI/Address
+with open('AccessControl.contract', 'r') as file_obj:
+    access_info = file_obj.readlines()
+# Get address/abi for object contract
+access_address = access_info[0][:-1]
+access_abi = json.loads(access_info[1])
+
 # Connect to object contract
 object_contract = w3.eth.contract(
     address = object_address,
@@ -40,8 +54,41 @@ subject_contract = w3.eth.contract(
     abi = subject_abi
 )
 
+# Connect to policy contract
+policy_contract = w3.eth.contract(
+    address = policy_address,
+    abi = policy_abi
+)
+
+# Connecting to object contract
+access_contract = w3.eth.contract(
+    address = access_address,
+    abi = access_abi
+)
+
 # --------------------------MAIN PROGRAM----------------------------
 print("[WAITING] Listening for new events...")
+def handle_access(sub_id, obj_id, action, access):
+    """
+    Function to handle the event of a access request.
+    If access is granted (access = 1) then prints success message
+    If access is denied (access = 2) then prints failure message
+    """
+    if access == 1:
+        print(f'[SUCCESS] Access Granted!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}')
+    elif access == 2:
+        print(f'[FAILURE] Access Denied!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}')
+    else:
+        print('[ERROR] INVALID ACCESS VARIABLE!')
+        
+
+def handle_new_pol(pol_id):
+    """
+    Function to handle the event of a new policy
+    being added and get the assigned pol_id
+    """
+    print(f'\nNew Policy Added! pol_id: {pol_id}')
+
 def handle_new_sub(sub_id, name):
     """
     Function to handle the event of a new subject
@@ -55,6 +102,60 @@ def handle_new_obj(obj_id, name):
     being added and get the assigned obj_id
     """
     print(f'\nNew Object Added! {name} with obj_id: {obj_id}')
+    
+async def fail_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every unsuccessful
+    access granted(access denied) by AccessControlContract
+    """
+    
+    while True:
+        for access_denied in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_access,
+                args = (
+                    access_denied['args']['sub_id'],
+                    access_denied['args']['obj_id'],
+                    access_denied['args']['action'],
+                    2
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
+    
+async def succ_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every successful
+    access granted by AccessControlContract
+    """
+    
+    while True:
+        for access_granted in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_access,
+                args = (
+                    access_granted['args']['sub_id'],
+                    access_granted['args']['obj_id'],
+                    access_granted['args']['action'],
+                    1
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
+    
+async def pol_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every policy added
+    to PolicyManagementContract
+    """
+    
+    while True:
+        for new_pol_added in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_new_pol,
+                args = (
+                    new_pol_added['args']['pol_id'],
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
 
 async def sub_loop(event_filter, poll_interval):
     """
@@ -94,12 +195,20 @@ async def obj_loop(event_filter, poll_interval):
 def main():
     subject_filter = subject_contract.events.NewSubjectAdded().createFilter(fromBlock = 'latest')
     object_filter = object_contract.events.NewObjectAdded().createFilter(fromBlock = 'latest')
+    policy_filter = policy_contract.events.PolicyAdded().createFilter(fromBlock = 'latest')
+    access_success = access_contract.events.AccessGranted().createFilter(fromBlock = 'latest')
+    access_failure = access_contract.events.AccessDenied().createFilter(fromBlock = 'latest')
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(
             asyncio.gather(
                 sub_loop(subject_filter, 2),
-                obj_loop(object_filter, 2)))
+                obj_loop(object_filter, 2),
+                pol_loop(policy_filter, 2),
+                succ_loop(access_success, 2),
+                fail_loop(access_failure, 2)
+                )
+            )
     finally:
         loop.close()
 
