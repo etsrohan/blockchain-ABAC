@@ -61,6 +61,7 @@ contract AccessControl {
 
     
     // Main access control function
+    // Checks bloom filter for existance of subject
     // Gets Subject/Object attributes from Subject/Object Contracts
     // Feeds Subject/Object Attributess to Policy Management Contract
     // From all the actions decides whether to allow access to object
