@@ -1,2 +1,0 @@
-IDEAS:
-    ADD an event listener that listens to all events on the blockchain (eg. new sub/obj/pol added)
