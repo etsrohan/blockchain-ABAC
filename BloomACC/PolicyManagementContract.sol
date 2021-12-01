@@ -366,8 +366,9 @@ contract PolicyManagement {
 
 
     // Function that takes ret_list (access_list), action, and time_stamp (add later)
-    // and returns a boolean for access control
-    // true: access granted, false: access denied
+    // and returns a uint8 error code for access control
+    // Error Codes:
+    // 0: access granted, 1: no match policy, 2: permission restricted, 3: access time out, 4: too frequent request
     function get_access (
         /**ARGUMENTS**/
         uint256[] memory access_list,

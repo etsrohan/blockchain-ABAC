@@ -66,7 +66,8 @@ contract AccessControl {
     // Feeds Subject/Object Attributess to Policy Management Contract
     // From all the actions decides whether to allow access to object
     // ACTION: 0 = read, 1 = write, 2 = execute, 3 = read & write, 4 = ...
-    // Add more actions in the future
+    // Emits AccessGranted for successful access request
+    // Emits AccessDenied with failure message otherwise
     function access_control(
         /**SUBJECT AND OBJECT IDS**/
         uint256 sub_id,
