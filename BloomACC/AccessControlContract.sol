@@ -133,6 +133,9 @@ contract AccessControl {
         // and return yes/no access variable
         bool access = policy_contract.get_access(ret_list, action, ToMFR);
 
+        // Change the Time of Most Frequent Request for subject
+        subject_contract.update_tomfr(sub_id);
+
         // Emit AccessGranted or AccessDenied events if subject has 
         // access to that object
         if (access) {
