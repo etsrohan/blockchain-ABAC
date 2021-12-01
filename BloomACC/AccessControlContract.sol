@@ -142,6 +142,7 @@ contract AccessControl {
         // Emit AccessGranted or AccessDenied events if subject has 
         // access to that object depending on error code from get_access function
         if (access == 0) {
+            // Release an EV Token for the subject if access granted
             EVToken token_contract = EVToken(token_address);
             token_contract.transfer_from_admin(msg.sender, 1);
             emit AccessGranted(sub_id, obj_id, action);

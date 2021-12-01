@@ -1,11 +1,8 @@
 # Import Modules and Functions
-from eth_typing.ethpm import ContractName
 from solcx import compile_files, compile_source
 import os
 from web3 import Web3
 import json
-
-from web3._utils.blocks import is_predefined_block_number
 
 # Getting current working directory (cwd)
 cwd = os.getcwd()

@@ -15,10 +15,12 @@ library SafeMath { // Only relevant functions
 }
 
 contract EVToken {
+    using SafeMath for uint256;
+
     // VARIABLES
-    uint256 total_supply;
-    address access_contract;
-    address admin;
+    uint256 private total_supply;
+    address private access_contract;
+    address private admin;
 
     mapping (address => uint256) private balances;
     mapping (address => mapping (address => uint256)) private allowed;

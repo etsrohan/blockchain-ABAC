@@ -1,11 +1,8 @@
 # Import Modules and Functions
-from eth_typing.ethpm import ContractName
 from solcx import compile_files, compile_source
 import os
 from web3 import Web3
 import json
-
-from web3._utils.blocks import is_predefined_block_number
 
 # Getting current working directory (cwd)
 cwd = os.getcwd()
@@ -14,12 +11,13 @@ compiled_sol = compile_files([cwd + '/AccessControlContract.sol'])
 
 # Some important exploration
 # print(os.getcwd())
-# /home/rohan/Desktop/Blockchain-ABAC/Base
+# /home/rohan/Desktop/Blockchain-ABAC/BloomACC
 
 # print(compiled_sol.keys())
-# '/home/rohan/Desktop/Blockchain-ABAC/Base/AccessControlContract.sol:AccessControl', 
+# dict_keys(['/home/rohan/Desktop/Blockchain-ABAC/BloomACC/AccessControlContract.sol:AccessControl', 
+# 'EVTokenContract.sol:EVToken', 'EVTokenContract.sol:SafeMath', 
 # 'ObjectAttributeContract.sol:ObjectAttribute', 'PolicyManagementContract.sol:PolicyManagement', 
-# 'SubjectAttributeContract.sol:SubjectAttribute'
+# 'SubjectAttributeContract.sol:SubjectAttribute'])
 
 # print(compiled_sol['SubjectAttributeContract.sol:SubjectAttribute'].keys())
 # 'abi', 'asm', 'bin', 'bin-runtime', 'devdoc', 'function-debug', 
@@ -40,7 +38,7 @@ BYTECODE = []
 CONTRACT_ADDRESS = []
 for name in compiled_sol.keys():
     # Skip Access Control because it needs to be deployed at the end
-    if 'AccessControl' in name:
+    if 'AccessControl' in name or 'EVToken' in name:
         continue
     print(f"[DEPLOYING] Deploying {name}...")
     # add contract name to contract_name list
@@ -73,10 +71,10 @@ for name in compiled_sol.keys():
     print(f"[INFO] Contract Address: {tx_receipt.contractAddress}\n")
     
 # convert contract_name,  from list to tuple to avoid changing it
-CONTRACT_NAME = tuple(CONTRACT_NAME)
-ABI = tuple(ABI)
-BYTECODE = tuple(BYTECODE)
-CONTRACT_ADDRESS = tuple(CONTRACT_ADDRESS)
+# CONTRACT_NAME = tuple(CONTRACT_NAME)
+# ABI = tuple(ABI)
+# BYTECODE = tuple(BYTECODE)
+# CONTRACT_ADDRESS = tuple(CONTRACT_ADDRESS)
 
 for index in range(3):
     if 'Object' in CONTRACT_NAME[index]:
