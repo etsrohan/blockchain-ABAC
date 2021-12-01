@@ -8,12 +8,12 @@ import 'ObjectAttributeContract.sol';
 contract AccessControl {
     // STRUCTS
     struct Store {
-        string name;
-        string organization;
-        string department;
-        string lab;
-        string role_place;
-        string other;
+        string attribute_1;
+        string attribute_2;
+        string attribute_3;
+        string attribute_4;
+        string attribute_5;
+        string attribute_6;
     }
 
     // VARIABLES
@@ -87,13 +87,15 @@ contract AccessControl {
         // Subject Information
         SubjectAttribute.SubjectState sub_state;
         Store memory sub_arg;
+        uint256 ToMFR;
         (sub_state,
-         sub_arg.name,
-         sub_arg.organization,
-         sub_arg.department,
-         sub_arg.lab,
-         sub_arg.role_place,
-         sub_arg.other)
+         sub_arg.attribute_1,
+         sub_arg.attribute_2,
+         sub_arg.attribute_3,
+         sub_arg.attribute_4,
+         sub_arg.attribute_5,
+         sub_arg.attribute_6,
+         ToMFR)
          = subject_contract.subjects(sub_id);
 
         // Object Information
@@ -101,35 +103,35 @@ contract AccessControl {
         ObjectAttribute.ObjectState obj_state;
         Store memory obj_arg;
         (obj_state,
-         obj_arg.name,
-         obj_arg.organization,
-         obj_arg.department,
-         obj_arg.lab,
-         obj_arg.role_place,
-         obj_arg.other)
+         obj_arg.attribute_1,
+         obj_arg.attribute_2,
+         obj_arg.attribute_3,
+         obj_arg.attribute_4,
+         obj_arg.attribute_5,
+         obj_arg.attribute_6)
          = object_contract.objects(obj_id);
         
         // Send Subject and Object info to Policy Management contract
         // and get list of policies relating to Subject and Object
         PolicyManagement policy_contract = PolicyManagement(policy_address);
-        policy_contract.find_match_policy([sub_arg.name,
-                                           sub_arg.organization,
-                                           sub_arg.department,
-                                           sub_arg.lab,
-                                           sub_arg.role_place,
-                                           sub_arg.other],
-                                          [obj_arg.name,
-                                           obj_arg.organization,
-                                           obj_arg.department,
-                                           obj_arg.lab,
-                                           obj_arg.role_place,
-                                           obj_arg.other]);
+        policy_contract.find_match_policy([sub_arg.attribute_1,
+                                           sub_arg.attribute_2,
+                                           sub_arg.attribute_3,
+                                           sub_arg.attribute_4,
+                                           sub_arg.attribute_5,
+                                           sub_arg.attribute_6],
+                                          [obj_arg.attribute_1,
+                                           obj_arg.attribute_2,
+                                           obj_arg.attribute_3,
+                                           obj_arg.attribute_4,
+                                           obj_arg.attribute_5,
+                                           obj_arg.attribute_6]);
 
         uint256[] memory ret_list = policy_contract.get_ret_list();
 
         // Function call to check action against list of policies
         // and return yes/no access variable
-        bool access = policy_contract.get_access(ret_list, action);
+        bool access = policy_contract.get_access(ret_list, action, ToMFR);
 
         // Emit AccessGranted or AccessDenied events if subject has 
         // access to that object

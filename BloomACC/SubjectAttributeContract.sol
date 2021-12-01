@@ -8,12 +8,13 @@ contract SubjectAttribute {
     // STRUCTS
     struct Subject{
         SubjectState state;
-        string name;
-        string organization;
-        string department;
-        string lab;
-        string role;
-        string other;
+        string manufacturer;
+        string current_location;
+        string vehicle_type;
+        string charging_efficiency;
+        string discharging_efficiency;
+        string energy_capacity;
+        uint256 ToMFR;
     }
 
     struct BloomFilter{
@@ -43,7 +44,7 @@ contract SubjectAttribute {
     }
 
     // EVENTS
-    event NewSubjectAdded(uint256 sub_id, string name);
+    event NewSubjectAdded(uint256 sub_id, string manufacturer);
     event SubjectChanged(uint256 sub_id);
 
     // FUNCTIONS
@@ -56,7 +57,7 @@ contract SubjectAttribute {
     }
     
     // Adds a new subject with given attributes:
-    // name, organization, department, lab, role, other
+    // manufacturer, current_location, vehicle_type, charging_efficiency, discharging_efficiency, energy_capacity, ToMFR
     // Emits NewSubjectAdded event with the sub_id
     function subject_add(
         /**SUBJECT ATTRIBUTES**/
@@ -70,16 +71,17 @@ contract SubjectAttribute {
         num_subjects++;
         subjects[sub_id].state = SubjectState.Active;
         // ADD MAIN ATTRIBS
-        subjects[sub_id].name = sub_arg[0];
-        subjects[sub_id].organization = sub_arg[1];
-        subjects[sub_id].department = sub_arg[2];
-        subjects[sub_id].lab = sub_arg[3];
-        subjects[sub_id].role = sub_arg[4];
-        subjects[sub_id].other = sub_arg[5];
+        subjects[sub_id].manufacturer = sub_arg[0];
+        subjects[sub_id].current_location = sub_arg[1];
+        subjects[sub_id].vehicle_type = sub_arg[2];
+        subjects[sub_id].charging_efficiency = sub_arg[3];
+        subjects[sub_id].discharging_efficiency = sub_arg[4];
+        subjects[sub_id].energy_capacity = sub_arg[5];
+        subjects[sub_id].ToMFR = 0;
         // ADD SUBJECT TO BLOOMFILTER
         add_bitmap(sub_id);
         // Emit event for new subject
-        emit NewSubjectAdded(sub_id, subjects[sub_id].name);
+        emit NewSubjectAdded(sub_id, subjects[sub_id].manufacturer);
     }
 
     // Adds a subject to bloom filter
@@ -183,17 +185,29 @@ contract SubjectAttribute {
     {
         // CHANGE MAIN ATTRIBS
         bytes memory empty_test = bytes(sub_arg[0]);
-        if (empty_test.length != 0) subjects[sub_id].name = sub_arg[0];
+        if (empty_test.length != 0) subjects[sub_id].manufacturer = sub_arg[0];
         empty_test = bytes(sub_arg[1]);
-        if (empty_test.length != 0) subjects[sub_id].organization = sub_arg[1];
+        if (empty_test.length != 0) subjects[sub_id].current_location = sub_arg[1];
         empty_test = bytes(sub_arg[2]);
-        if (empty_test.length != 0) subjects[sub_id].department = sub_arg[2];
+        if (empty_test.length != 0) subjects[sub_id].vehicle_type = sub_arg[2];
         empty_test = bytes(sub_arg[3]);
-        if (empty_test.length != 0) subjects[sub_id].lab = sub_arg[3];
+        if (empty_test.length != 0) subjects[sub_id].charging_efficiency = sub_arg[3];
         empty_test = bytes(sub_arg[4]);
-        if (empty_test.length != 0) subjects[sub_id].role = sub_arg[4];
+        if (empty_test.length != 0) subjects[sub_id].discharging_efficiency = sub_arg[4];
         empty_test = bytes(sub_arg[5]);
-        if (empty_test.length != 0) subjects[sub_id].other = sub_arg[5];
+        if (empty_test.length != 0) subjects[sub_id].energy_capacity = sub_arg[5];
         emit SubjectChanged(sub_id);
+    }
+
+    // Updates the Time of Most Frequent Request to
+    // current time. To be used by the AccessControlContract.
+    function update_tomfr(
+        /**SUBJECT ID**/
+        uint256 sub_id
+    )
+        external
+        sub_active(sub_id)
+    {
+        subjects[sub_id].ToMFR = block.timestamp;
     }
 }

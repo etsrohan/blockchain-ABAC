@@ -8,12 +8,12 @@ contract ObjectAttribute {
     // STRUCTS
     struct Object{
         ObjectState state;
-        string name;
-        string organization;
-        string department;
-        string lab;
-        string place;
-        string other;
+        string avg_wait_time;
+        string location;
+        string avg_charging_time;
+        string num_charging_outlets;
+        string charging_power;
+        string utilization_rate;
     }
 
     // VARIABLES
@@ -37,7 +37,7 @@ contract ObjectAttribute {
     }
 
     // EVENTS
-    event NewObjectAdded(uint256 obj_id, string name);
+    event NewObjectAdded(uint256 obj_id, string location);
     event ObjectChanged(uint256 obj_id);
 
     // FUNCTIONS
@@ -48,7 +48,7 @@ contract ObjectAttribute {
     }
 
     // Adds Object with given attributes:
-    // name, organization, department, lab, place, other
+    // avg_wait_time, location, avg_charging_time, num_charging_outlet, charging_power, utilization_rate
     // Emits NewObjectAdded event with obj_id
     function object_add(
         /**OBJECT ATTRIBUTES**/
@@ -62,13 +62,13 @@ contract ObjectAttribute {
         num_objects++;
         objects[obj_id].state = ObjectState.Active;
         // ADD MAIN ATTRIBS
-        objects[obj_id].name = obj_arg[0];
-        objects[obj_id].organization = obj_arg[1];
-        objects[obj_id].department = obj_arg[2];
-        objects[obj_id].lab = obj_arg[3];
-        objects[obj_id].place = obj_arg[4];
-        objects[obj_id].other = obj_arg[5];
-        emit NewObjectAdded(obj_id, objects[obj_id].name);
+        objects[obj_id].avg_wait_time = obj_arg[0];
+        objects[obj_id].location = obj_arg[1];
+        objects[obj_id].avg_charging_time = obj_arg[2];
+        objects[obj_id].num_charging_outlets = obj_arg[3];
+        objects[obj_id].charging_power = obj_arg[4];
+        objects[obj_id].utilization_rate = obj_arg[5];
+        emit NewObjectAdded(obj_id, objects[obj_id].location);
     }
 
     // Sets object to "deactivated" mode
@@ -131,17 +131,17 @@ contract ObjectAttribute {
         // CHANGE MAIN ATTRIBS
         // Check for empty field, if empty don't change
         bytes memory empty_test = bytes(obj_arg[0]);
-        if (empty_test.length != 0) objects[obj_id].name = obj_arg[0];
+        if (empty_test.length != 0) objects[obj_id].avg_wait_time = obj_arg[0];
         empty_test = bytes(obj_arg[1]);
-        if (empty_test.length != 0) objects[obj_id].organization = obj_arg[1];
+        if (empty_test.length != 0) objects[obj_id].location = obj_arg[1];
         empty_test = bytes(obj_arg[2]);
-        if (empty_test.length != 0) objects[obj_id].department = obj_arg[2];
+        if (empty_test.length != 0) objects[obj_id].avg_charging_time = obj_arg[2];
         empty_test = bytes(obj_arg[3]);
-        if (empty_test.length != 0) objects[obj_id].lab = obj_arg[3];
+        if (empty_test.length != 0) objects[obj_id].num_charging_outlets = obj_arg[3];
         empty_test = bytes(obj_arg[4]);
-        if (empty_test.length != 0) objects[obj_id].place = obj_arg[4];
+        if (empty_test.length != 0) objects[obj_id].charging_power = obj_arg[4];
         empty_test = bytes(obj_arg[5]);
-        if (empty_test.length != 0) objects[obj_id].other = obj_arg[5];
+        if (empty_test.length != 0) objects[obj_id].utilization_rate = obj_arg[5];
 
         // Emit event for successful object attribute change 
         emit ObjectChanged(obj_id);
