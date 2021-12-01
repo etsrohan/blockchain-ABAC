@@ -279,7 +279,8 @@ contract PolicyManagement {
         string[6] memory obj_arg
     )
         /**MODIFIERS**/
-        public
+        external
+        returns(uint256 [] memory)
     {
         uint256 count;
         uint256 i;
@@ -346,6 +347,8 @@ contract PolicyManagement {
             // Add entry to list of similar policies
             ret_list.push(count);
         }
+
+        return ret_list;
     }
     
     
@@ -373,12 +376,14 @@ contract PolicyManagement {
     )
         external
         view
-        returns (bool)
+        returns (uint8)
     {
         // Check to see if access list is empty
         if (access_list.length == 0){
-            return false;
+            return 1;
         }
+
+        uint8 error_code = 0;
 
         // Set read/write/execute to true if any policy in access_list allows to do so
         bool read = false;
@@ -398,19 +403,29 @@ contract PolicyManagement {
                     execute = true;
                 }
             }
+            else if (
+            block.timestamp <= policies[access_list[i]].context.start_time ||
+            block.timestamp >= policies[access_list[i]].context.end_time){
+                error_code = 3;
+            }
+            else if ((block.timestamp - ToMFR) < policies[access_list[i]].context.min_interval){
+                error_code = 4;
+            }
         }
 
         // Action: 0 = read, 1 = write, 2 = execute, 3 = read & write
         if (action == 0 && read) {
-            return true;
+            error_code = 0;
         } else if (action == 1 && write) {
-            return true;
+            error_code = 0;
         } else if (action == 2 && execute) {
-            return true;
+            error_code = 0;
         } else if (action == 3 && read && write) {
-            return true;
-        } else {
-            return false;
+            error_code = 0;
+        } else if (error_code == 0){
+            error_code = 2;
         }
+
+        return error_code;
     }
 }

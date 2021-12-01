@@ -114,34 +114,39 @@ contract AccessControl {
         // Send Subject and Object info to Policy Management contract
         // and get list of policies relating to Subject and Object
         PolicyManagement policy_contract = PolicyManagement(policy_address);
-        policy_contract.find_match_policy([sub_arg.attribute_1,
-                                           sub_arg.attribute_2,
-                                           sub_arg.attribute_3,
-                                           sub_arg.attribute_4,
-                                           sub_arg.attribute_5,
-                                           sub_arg.attribute_6],
-                                          [obj_arg.attribute_1,
-                                           obj_arg.attribute_2,
-                                           obj_arg.attribute_3,
-                                           obj_arg.attribute_4,
-                                           obj_arg.attribute_5,
-                                           obj_arg.attribute_6]);
-
-        uint256[] memory ret_list = policy_contract.get_ret_list();
+        uint256[] memory ret_list = policy_contract.find_match_policy(
+        [sub_arg.attribute_1,
+         sub_arg.attribute_2,
+         sub_arg.attribute_3,
+         sub_arg.attribute_4,
+         sub_arg.attribute_5,
+         sub_arg.attribute_6],
+        [obj_arg.attribute_1,
+         obj_arg.attribute_2,
+         obj_arg.attribute_3,
+         obj_arg.attribute_4,
+         obj_arg.attribute_5,
+         obj_arg.attribute_6]);
 
         // Function call to check action against list of policies
         // and return yes/no access variable
-        bool access = policy_contract.get_access(ret_list, action, ToMFR);
+        uint8 access = policy_contract.get_access(ret_list, action, ToMFR);
 
         // Change the Time of Most Frequent Request for subject
         subject_contract.update_tomfr(sub_id);
 
         // Emit AccessGranted or AccessDenied events if subject has 
-        // access to that object
-        if (access) {
+        // access to that object depending on error code from get_access function
+        if (access == 0) {
             emit AccessGranted(sub_id, obj_id, action);
-        } else {
-            emit AccessDenied(sub_id, obj_id, action, "Permission Invalid");
+        } else if (access == 1){
+            emit AccessDenied(sub_id, obj_id, action, "No Match Policy");
+        } else if (access == 2){
+            emit AccessDenied(sub_id, obj_id, action, "Permission Restricted");
+        } else if (access == 3){
+            emit AccessDenied(sub_id, obj_id, action, "Access Time Out");
+        } else if (access == 4){
+            emit AccessDenied(sub_id, obj_id, action, "Too Frequent Request");
         }
     }
 }
