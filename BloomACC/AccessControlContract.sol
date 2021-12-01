@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import 'PolicyManagementContract.sol';
 import 'SubjectAttributeContract.sol';
 import 'ObjectAttributeContract.sol';
+import 'EVTokenContract.sol';
 
 contract AccessControl {
     // STRUCTS
@@ -20,6 +21,7 @@ contract AccessControl {
     address policy_address;
     address subject_address;
     address object_address;
+    address token_address;
     address admin;
 
     // EVENTS
@@ -33,12 +35,13 @@ contract AccessControl {
     }
 
     // FUNCTIONS
-    constructor(address pol_con, address sub_con, address obj_con)
+    constructor(address sub_con, address obj_con, address pol_con, address tok_con)
     {
         admin = msg.sender;
         policy_address = pol_con;
         subject_address = sub_con;
         object_address = obj_con;
+        token_address = tok_con;
     }
 
 
@@ -139,6 +142,8 @@ contract AccessControl {
         // Emit AccessGranted or AccessDenied events if subject has 
         // access to that object depending on error code from get_access function
         if (access == 0) {
+            EVToken token_contract = EVToken(token_address);
+            token_contract.transfer_from_admin(msg.sender, 1);
             emit AccessGranted(sub_id, obj_id, action);
         } else if (access == 1){
             emit AccessDenied(sub_id, obj_id, action, "No Match Policy");
