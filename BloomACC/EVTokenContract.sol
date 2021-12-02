@@ -47,6 +47,7 @@ contract EVToken {
         admin = msg.sender;
     }
 
+    // returns total supply of EVToken
     function get_total_supply()
         public
         view
@@ -55,6 +56,7 @@ contract EVToken {
         return total_supply;
     }
 
+    // returns token balance of a specific address
     function get_balance(
         address token_owner
     )
@@ -65,6 +67,7 @@ contract EVToken {
         return balances[token_owner];
     }
 
+    // function to transfer tokens from self to receiver
     function transfer(
         address receiver,
         uint256 num_tokens
@@ -79,6 +82,7 @@ contract EVToken {
         return true;
     }
 
+    // appoint a third party to delegate a transaction with num_tokens
     function approve(
         address delegate,
         uint256 num_tokens
@@ -91,6 +95,7 @@ contract EVToken {
         return true;
     }
 
+    // check allowance that delegate can transfer from owner for transaction
     function allowance(
         address owner,
         address delegate
@@ -102,6 +107,7 @@ contract EVToken {
         return allowed[owner][delegate];
     }
 
+    // to be used by the delegate to transfer tokens from owner to a buyer
     function transfer_from(
         address owner,
         address buyer,
@@ -119,6 +125,8 @@ contract EVToken {
         return true;
     }
 
+    // To be used by the access control contract to transfer funds from admin
+    // to the caller of access request if access is granted
     function transfer_from_admin(
         address buyer,
         uint256 num_tokens
@@ -134,6 +142,8 @@ contract EVToken {
         return true;
     }
 
+    // function to set the access control contract address into 
+    // EVToken contract
     function set_access_address(
         address acc
     )

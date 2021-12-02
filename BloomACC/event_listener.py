@@ -35,10 +35,17 @@ with open('PolicyManagement.contract', 'r') as file_obj:
 policy_address = policy_info[0][:-1]
 policy_abi = json.loads(policy_info[1])
 
+# Open and get Token ABI/Address
+with open('EVToken.contract', 'r') as file_obj:
+    token_info = file_obj.readlines()
+# Get address/abi for token contract
+token_address = token_info[0][:-1]
+token_abi = json.loads(token_info[1])
+
 # Open and get Access ABI/Address
 with open('AccessControl.contract', 'r') as file_obj:
     access_info = file_obj.readlines()
-# Get address/abi for object contract
+# Get address/abi for access contract
 access_address = access_info[0][:-1]
 access_abi = json.loads(access_info[1])
 
@@ -60,6 +67,12 @@ policy_contract = w3.eth.contract(
     abi = policy_abi
 )
 
+# Connecting to token contract
+token_contract = w3.eth.contract(
+    address = token_address,
+    abi = token_abi
+)
+
 # Connecting to access contract
 access_contract = w3.eth.contract(
     address = access_address,
@@ -68,7 +81,9 @@ access_contract = w3.eth.contract(
 
 # --------------------------MAIN PROGRAM----------------------------
 print("[WAITING] Listening for new events...")
-def handle_access(sub_id, obj_id, action, access):
+
+# HANDLE FUNCTIONS
+def handle_access(sub_id, obj_id, action, access, message):
     """
     Function to handle the event of a access request.
     If access is granted (access = 1) then prints success message
@@ -77,7 +92,7 @@ def handle_access(sub_id, obj_id, action, access):
     if access == 1:
         print(f'\n[SUCCESS] Access Granted!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}')
     elif access == 2:
-        print(f'\n[FAILURE] Access Denied!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}')
+        print(f'\n[FAILURE] Access Denied!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}\nmessage: {message}')
     else:
         print('\n[ERROR] INVALID ACCESS VARIABLE!')
         
@@ -89,20 +104,31 @@ def handle_new_pol(pol_id):
     """
     print(f'\nNew Policy Added! pol_id: {pol_id}')
 
-def handle_new_sub(sub_id, name):
+def handle_new_sub(sub_id, manufacturer):
     """
     Function to handle the event of a new subject
     being added and get the assigned sub_id
     """
-    print(f'\nNew Subject Added! {name} with sub_id: {sub_id}')
+    print(f'\nNew Subject Added! {manufacturer} with sub_id: {sub_id}')
 
-def handle_new_obj(obj_id, name):
+def handle_new_obj(obj_id, location):
     """
     Function to handle the event of a new object
     being added and get the assigned obj_id
     """
-    print(f'\nNew Object Added! {name} with obj_id: {obj_id}')
+    print(f'\nNew Object Added! {location} with obj_id: {obj_id}')
+
+def handle_transfer(owner, receiver, num_tokens):
+    """
+    Function to handle the event of a new transfer of EVToken
+    from an owner to a receiver, num_tokens is the number of tokens transferred
+    """
+    print(f''''\n[SUCCESS] EVToken Transferred-\n
+             \r\tSubject: 0x...{receiver[-4:]}\n
+             \r\tAdmin: 0x...{owner[-4:]}\n
+             \r\tAmount: {num_tokens}\n''')
     
+# ASYNC FUNCTIONS
 async def fail_loop(event_filter, poll_interval):
     """
     Asynchronous function to create new threads for every unsuccessful
@@ -117,7 +143,8 @@ async def fail_loop(event_filter, poll_interval):
                     access_denied['args']['sub_id'],
                     access_denied['args']['obj_id'],
                     access_denied['args']['action'],
-                    2
+                    2,
+                    access_denied['args']['message']
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -136,7 +163,8 @@ async def succ_loop(event_filter, poll_interval):
                     access_granted['args']['sub_id'],
                     access_granted['args']['obj_id'],
                     access_granted['args']['action'],
-                    1
+                    1,
+                    ''
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -169,7 +197,7 @@ async def sub_loop(event_filter, poll_interval):
                 target = handle_new_sub,
                 args = (
                     new_sub_added['args']['sub_id'],
-                    new_sub_added['args']['name']
+                    new_sub_added['args']['manufacturer']
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -186,7 +214,25 @@ async def obj_loop(event_filter, poll_interval):
                 target = handle_new_obj,
                 args = (
                     new_obj_added['args']['obj_id'],
-                    new_obj_added['args']['name']
+                    new_obj_added['args']['location']
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
+    
+async def transfer_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every transfer of tokens
+    taking place
+    """
+    
+    while True:
+        for new_transfer in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_transfer,
+                args = (
+                    new_transfer['args']['sender'],
+                    new_transfer['args']['receiver'],
+                    new_transfer['args']['num_tokens']
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -198,6 +244,7 @@ def main():
     policy_filter = policy_contract.events.PolicyAdded().createFilter(fromBlock = 'latest')
     access_success = access_contract.events.AccessGranted().createFilter(fromBlock = 'latest')
     access_failure = access_contract.events.AccessDenied().createFilter(fromBlock = 'latest')
+    transfer_filter = token_contract.events.Transfer().createFilter(fromBlock = 'latest')
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(
@@ -206,7 +253,8 @@ def main():
                 obj_loop(object_filter, 2),
                 pol_loop(policy_filter, 2),
                 succ_loop(access_success, 2),
-                fail_loop(access_failure, 2)
+                fail_loop(access_failure, 2),
+                transfer_loop(transfer_filter, 2)
                 )
             )
     finally:
