@@ -1,5 +1,5 @@
-Rohan;NexG;Blockchain;Main;IE;None
-Rani;NexG;Blockchain;Main;Manager;None
-Surya;NexG;Network;Main;IE;None
-Harsha;NexG;Android;Main;IE;None
-Omi;NexG;Database;Main;Manager;None
+Revel;Charge Point, 3650 Airport;Hybrid electric vehicle;86.33%;84%;50kWh
+Tesla;Charge Station, 123 sun road;Electric vehicle;90%;95%;80kWh
+Tata;Charge Point, yamuna highway;Electric vehicle;87%;90%;70kWh
+OLA;Charge Point, DND;Electric Scooter;70%;75%;30kWh
+Mahindra;Charge Point, 3650 Airport;Hybrid electric vehicle;80%;80%;80kWh:5 hours;123 sun road;5 hours;3;100kW;100%:

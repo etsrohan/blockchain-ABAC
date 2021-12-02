@@ -29,11 +29,11 @@ policy_contract = w3.eth.contract(
 )
 # --------------------------MAIN PROGRAM----------------------------
 # Policy Content:
-# Subject = (Name, Organization, Department, Lab, Role , Other)
-# Object = (Name, Organization, Department, Lab, Place , Other)
+# Subject = (Manufacturer, current_location, vehicle_type, charging_efficiency, discharging_efficiency, energy_capacity, ToMFR)
+# Object = (Avg. Waiting Time, Location, Avg. charging time, number of charging outlets, Charging Power, Utilization Rate)
 # Action = (read, write, execute)
-# Context = mode, (start_time, end_time)
-# policy add ABI expects 5 inputs: subject list, object list, action list, contest mode, contextstart/end list
+# Context = (min_interval, start_time, end_time)
+# policy add ABI expects 4 inputs: subject list, object list, action list, context list
 
 # Send policy function to send policy_add transaction
 def send_policy(policy):
@@ -43,13 +43,12 @@ def send_policy(policy):
     """
     # Split policy into subject, object, action, con_mode and con_time
     policy = policy.split(':')
-    if len(policy) != 5:
-        print('[ERROR] INVALID POLICY. MAKE SURE POLICY HAS 5 PARTS.')
+    if len(policy) != 4:
+        print('[ERROR] INVALID POLICY. MAKE SURE POLICY HAS 4 PARTS.')
         return
     
-    for i in range(5):
-        if ';' in policy[i]:
-            policy[i] = policy[i].split(';')
+    for i in range(4):
+        policy[i] = policy[i].split(';')
 
     # Loop through every context and turn it into boolean
     for i in range(3):
@@ -58,12 +57,9 @@ def send_policy(policy):
         else:
             policy[2][i] = False
     
-    # Convert con_mode into int
-    policy[3] = int(policy[3])
-    
-    # Convert con_time into list of 2 ints
-    for i in range(2):
-        policy[4][i] = int(policy[4][i])
+    # Convert context into list of 3 ints
+    for i in range(3):
+        policy[3][i] = int(policy[3][i])
     
     # Send policy_add transaction
     tx_hash = policy_contract.functions.policy_add(*policy).transact()
@@ -72,8 +68,7 @@ def send_policy(policy):
           \r\t{policy[0]}\n
           \r\t{policy[1]}\n
           \r\t{policy[2]}\n
-          \r\t{policy[3]}\n
-          \r\t{policy[4]}\n""")
+          \r\t{policy[3]}\n""")
     
 # Get policies from policies.txt
 with open('policies.txt', 'r') as file_obj:

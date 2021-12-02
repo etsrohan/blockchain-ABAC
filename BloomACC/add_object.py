@@ -30,7 +30,8 @@ object_contract = w3.eth.contract(
 
 # --------------------------MAIN PROGRAM----------------------------
 # Object Attributes:
-#   Name, Organization, Department, Lab, Place , Other
+#   Avg. Waiting Time, Location, Avg. charging time, number of charging outlets
+#   Charging Power, Utilization Rate
 
 # Send object function to send object_add transaction
 def send_object(object):
@@ -40,7 +41,7 @@ def send_object(object):
     """
     tx_hash = object_contract.functions.object_add(object.split(';')).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    print(f"[SUCCESS] Added object {object.split(';')[0]}")
+    print(f"[SUCCESS] Added object {object.split(';')[1]}")
 
 # Get objects data from objects.txt
 with open('objects.txt', 'r') as file_obj:

@@ -30,7 +30,8 @@ subject_contract = w3.eth.contract(
 
 # --------------------------MAIN PROGRAM----------------------------
 # Subject Attributes:
-#   Name, Organization, Department, Lab, Role , Other
+#   Manufacturer, current_location, vehicle_type, charging_efficiency
+#   discharging_efficiency, energy_capacity, ToMFR
 
 # Send subject function to send subject_add transaction
 def send_subject(subject):

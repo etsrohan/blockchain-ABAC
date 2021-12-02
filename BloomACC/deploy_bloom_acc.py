@@ -34,7 +34,7 @@ w3 = Web3(Web3.HTTPProvider(ganache_url))
 
 # Check to see if connected to ganache
 if w3.isConnected():
-    print('[CONNECTED] Connection to Ganache Blockchain Established!')
+    print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
     
 # Get user input for initial balance of EVToken
 num_token = int(input('Please Enter the Total Supply of EVToken:'))

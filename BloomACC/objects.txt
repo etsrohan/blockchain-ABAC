@@ -1,5 +1,5 @@
-Computer1;NexG;Blockchain;Main;Office;None
-Projector1;NexG;Blockchain;Main;Conference;None
-Computer2;NexG;Android;Main;Office;None
-Computer3;NexG;Network;Main;Office;None
-Printer1;NexG;Database;Main;Office;None
+4 hours;255 Openstreet;4 hours;10;100kW;95%
+2 hours;3650 Airport;2 hours;10;150kW;98%
+1 hours;yamuna highway;1 hours;20;200kW;93%
+3 hours;DND;3 hours;5;100kW;96%
+5 hours;123 sun road;5 hours;3;100kW;100%

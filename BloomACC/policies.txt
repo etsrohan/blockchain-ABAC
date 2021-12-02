@@ -1,5 +1,5 @@
-;NexG;Blockchain;;;:;NexG;Blockchain;;;:true;true;false:0:0;0
-;NexG;Network;;;:;NexG;Network;;;:true;true;false:0:0;0
-;NexG;Android;;;:;NexG;Android;;;:true;true;false:0:0;0
-;NexG;Database;;;:;NexG;Database;;;:true;true;false:0:0;0
-;NexG;;;Manager;:;NexG;;;;:true;true;true:0:0;0
+Revel;Charge Point, 3650 Airport;Hybrid electric vehicle;86.33%;84%;50kWh:4 hours;255 Openstreet;4 hours;10;100kW;95%:true;false;false:600;0;1648439712
+Tesla;Charge Station, 123 sun road;Electric vehicle;90%;95%;80kWh:2 hours;3650 Airport;2 hours;10;150kW;98%:true;false;true:30;0;1648439712
+Tata;Charge Point, yamuna highway;Electric vehicle;87%;90%;70kWh:1 hours;yamuna highway;1 hours;20;200kW;93%:true;false;true:300;0;1648439712
+OLA;Charge Point, DND;Electric Scooter;70%;75%;30kWh:3 hours;DND;3 hours;5;100kW;96%:true;true;true:60;0;1648439712
+Mahindra;Charge Point, 3650 Airport;Hybrid electric vehicle;80%;80%;80kWh:5 hours;123 sun road;5 hours;3;100kW;100%:true;false;false:60;0;1638439939
