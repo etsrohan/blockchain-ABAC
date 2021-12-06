@@ -27,6 +27,10 @@ contract AccessControl {
     // EVENTS
     event AccessGranted (uint256 sub_id, uint256 obj_id, uint8 action);
     event AccessDenied (uint256 sub_id, uint256 obj_id, uint8 action, string message);
+    // These are only to show that authentication succeeded or 
+    // failed and wont be there in the productionized versioon of the smart contract
+    event AuthenticationSuccess(uint256 sub_id);
+    event AuthenticationFailure(uint256 sub_id);
 
     // MODIFIERS
     modifier admin_only(){
@@ -85,8 +89,10 @@ contract AccessControl {
         SubjectAttribute subject_contract = SubjectAttribute(subject_address);
         if(!subject_contract.check_bitmap(sub_id)){
             emit AccessDenied(sub_id, obj_id, action, "Subject Not Found!");
+            emit AuthenticationFailure(sub_id);
             return;
         }
+        else emit AuthenticationSuccess(sub_id);
 
         // Subject Information
         SubjectAttribute.SubjectState sub_state;

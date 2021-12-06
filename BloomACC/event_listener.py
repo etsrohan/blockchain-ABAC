@@ -118,15 +118,28 @@ def handle_new_obj(obj_id, location):
     """
     print(f'\nNew Object Added! {location} with obj_id: {obj_id}')
 
-def handle_transfer(owner, receiver, num_tokens):
+def handle_transfer(owner, receiver, num_tokens, expiration_time):
     """
     Function to handle the event of a new transfer of EVToken
     from an owner to a receiver, num_tokens is the number of tokens transferred
     """
-    print(f''''\n[SUCCESS] EVToken Transferred-\n
-             \r\tSubject: 0x...{receiver[-4:]}\n
-             \r\tAdmin: 0x...{owner[-4:]}\n
-             \r\tAmount: {num_tokens}\n''')
+    print(f'''\n[SUCCESS] EVToken Transferred-\n
+              \r\tSubject: 0x...{receiver[-4:]}\n
+              \r\tAdmin: 0x...{owner[-4:]}\n
+              \r\tAmount: {num_tokens}\n
+              \r\tExpiration Time: {expiration_time}\n''')
+    
+def handle_auth_succ(sub_id):
+    """
+    Function to handle the event of authentication success of a subject
+    """
+    print(f'\nAuthentication Success: {sub_id}\n')
+    
+def handle_auth_fail(sub_id):
+    """
+    Function to handle the event of authentication failure of a subject
+    """
+    print(f'\nAuthentication Failure: {sub_id}\n')
     
 # ASYNC FUNCTIONS
 async def fail_loop(event_filter, poll_interval):
@@ -219,6 +232,38 @@ async def obj_loop(event_filter, poll_interval):
             thread.start()
         await asyncio.sleep(poll_interval)
     
+async def auth_success_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every transfer of tokens
+    taking place
+    """
+    
+    while True:
+        for success in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_auth_succ,
+                args = (
+                    success['args']['sub_id'],
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
+
+async def auth_fail_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every transfer of tokens
+    taking place
+    """
+    
+    while True:
+        for failure in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_auth_fail,
+                args = (
+                    failure['args']['sub_id'],
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
+
 async def transfer_loop(event_filter, poll_interval):
     """
     Asynchronous function to create new threads for every transfer of tokens
@@ -230,9 +275,10 @@ async def transfer_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_transfer,
                 args = (
-                    new_transfer['args']['sender'],
+                    new_transfer['args']['admin'],
                     new_transfer['args']['receiver'],
-                    new_transfer['args']['num_tokens']
+                    new_transfer['args']['num_tokens'],
+                    new_transfer['args']['expiration_time']
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -244,7 +290,9 @@ def main():
     policy_filter = policy_contract.events.PolicyAdded().createFilter(fromBlock = 'latest')
     access_success = access_contract.events.AccessGranted().createFilter(fromBlock = 'latest')
     access_failure = access_contract.events.AccessDenied().createFilter(fromBlock = 'latest')
-    transfer_filter = token_contract.events.Transfer().createFilter(fromBlock = 'latest')
+    authentication_success = access_contract.events.AuthenticationSuccess().createFilter(fromBlock = 'latest')
+    authentication_failure = access_contract.events.AuthenticationFailure().createFilter(fromBlock = 'latest')
+    transfer_filter = token_contract.events.AdminTransfer().createFilter(fromBlock = 'latest')
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(
@@ -254,7 +302,9 @@ def main():
                 pol_loop(policy_filter, 2),
                 succ_loop(access_success, 2),
                 fail_loop(access_failure, 2),
-                transfer_loop(transfer_filter, 2)
+                transfer_loop(transfer_filter, 2),
+                auth_success_loop(authentication_success, 2),
+                auth_fail_loop(authentication_failure, 2)
                 )
             )
     finally:
