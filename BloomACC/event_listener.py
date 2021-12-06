@@ -141,6 +141,13 @@ def handle_auth_fail(sub_id):
     """
     print(f'\nAuthentication Failure: {sub_id}\n')
     
+def handle_sub_change(sub_id):
+    """
+    Function to handle the event of subject attributes being changed
+    """
+    print(f'''\nSubject Attributes changed: 
+              \r\tSubject ID: {sub_id}\n''')
+    
 # ASYNC FUNCTIONS
 async def fail_loop(event_filter, poll_interval):
     """
@@ -231,11 +238,11 @@ async def obj_loop(event_filter, poll_interval):
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
-    
+
 async def auth_success_loop(event_filter, poll_interval):
     """
-    Asynchronous function to create new threads for every transfer of tokens
-    taking place
+    Asynchronous function to create new threads for every authentication
+    success
     """
     
     while True:
@@ -250,8 +257,8 @@ async def auth_success_loop(event_filter, poll_interval):
 
 async def auth_fail_loop(event_filter, poll_interval):
     """
-    Asynchronous function to create new threads for every transfer of tokens
-    taking place
+    Asynchronous function to create new threads for every authentication
+    failure
     """
     
     while True:
@@ -282,10 +289,27 @@ async def transfer_loop(event_filter, poll_interval):
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
+        
+async def sub_change_loop(event_filter, poll_interval):
+    """
+    Asynchronous function to create new threads for every change in subject
+    attributes
+    """
+    
+    while True:
+        for change in event_filter.get_new_entries():
+            thread = threading.Thread(
+                target = handle_sub_change,
+                args = (
+                    change['args']['sub_id'],
+                ))
+            thread.start()
+        await asyncio.sleep(poll_interval)
 
 # Main Function 
 def main():
     subject_filter = subject_contract.events.NewSubjectAdded().createFilter(fromBlock = 'latest')
+    sub_change_filter = subject_contract.events.SubjectChanged().createFilter(fromBlock = 'latest')
     object_filter = object_contract.events.NewObjectAdded().createFilter(fromBlock = 'latest')
     policy_filter = policy_contract.events.PolicyAdded().createFilter(fromBlock = 'latest')
     access_success = access_contract.events.AccessGranted().createFilter(fromBlock = 'latest')
@@ -304,7 +328,8 @@ def main():
                 fail_loop(access_failure, 2),
                 transfer_loop(transfer_filter, 2),
                 auth_success_loop(authentication_success, 2),
-                auth_fail_loop(authentication_failure, 2)
+                auth_fail_loop(authentication_failure, 2),
+                sub_change_loop(sub_change_filter, 2)
                 )
             )
     finally:
