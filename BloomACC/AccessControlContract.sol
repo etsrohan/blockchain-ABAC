@@ -18,19 +18,21 @@ contract AccessControl {
     }
 
     // VARIABLES
+    // These are contract addresses
     address policy_address;
     address subject_address;
     address object_address;
     address token_address;
+    // Address of the admin node
     address admin;
 
     // EVENTS
-    event AccessGranted (uint256 sub_id, uint256 obj_id, uint8 action);
-    event AccessDenied (uint256 sub_id, uint256 obj_id, uint8 action, string message);
+    event AccessGranted (address sub_addr, address obj_addr, uint8 action);
+    event AccessDenied (address sub_addr, address obj_addr, uint8 action, string message);
     // These are only to show that authentication succeeded or 
     // failed and wont be there in the productionized versioon of the smart contract
-    event AuthenticationSuccess(uint256 sub_id);
-    event AuthenticationFailure(uint256 sub_id);
+    event AuthenticationSuccess (address sub_addr);
+    event AuthenticationFailure (address sub_addr);
 
     // MODIFIERS
     modifier admin_only(){
@@ -77,8 +79,7 @@ contract AccessControl {
     // Emits AccessDenied with failure message otherwise
     function access_control(
         /**SUBJECT AND OBJECT IDS**/
-        uint256 sub_id,
-        uint256 obj_id,
+        address obj_addr,
         /**ACTION**/
         uint8 action
     )
@@ -87,12 +88,12 @@ contract AccessControl {
     {
         // Check Bloom Filter for existance of subject
         SubjectAttribute subject_contract = SubjectAttribute(subject_address);
-        if(!subject_contract.check_bitmap(sub_id)){
-            emit AccessDenied(sub_id, obj_id, action, "Subject Not Found!");
-            emit AuthenticationFailure(sub_id);
+        if(!subject_contract.check_bitmap(msg.sender)){
+            emit AccessDenied(msg.sender, obj_addr, action, "Subject Not Found!");
+            emit AuthenticationFailure(msg.sender);
             return;
         }
-        else emit AuthenticationSuccess(sub_id);
+        else emit AuthenticationSuccess(msg.sender);
 
         // Subject Information
         SubjectAttribute.SubjectState sub_state;
@@ -106,7 +107,7 @@ contract AccessControl {
          sub_arg.attribute_5,
          sub_arg.attribute_6,
          ToMFR)
-         = subject_contract.subjects(sub_id);
+         = subject_contract.subjects(msg.sender);
 
         // Object Information
         ObjectAttribute object_contract = ObjectAttribute(object_address);
@@ -119,7 +120,7 @@ contract AccessControl {
          obj_arg.attribute_4,
          obj_arg.attribute_5,
          obj_arg.attribute_6)
-         = object_contract.objects(obj_id);
+         = object_contract.objects(obj_addr);
         
         // Send Subject and Object info to Policy Management contract
         // and get list of policies relating to Subject and Object
@@ -143,7 +144,7 @@ contract AccessControl {
         uint8 access = policy_contract.get_access(ret_list, action, ToMFR);
 
         // Change the Time of Most Frequent Request for subject
-        subject_contract.update_tomfr(sub_id);
+        subject_contract.update_tomfr(msg.sender);
 
         // Emit AccessGranted or AccessDenied events if subject has 
         // access to that object depending on error code from get_access function
@@ -151,15 +152,15 @@ contract AccessControl {
             // Release an EV Token for the subject if access granted
             EVToken token_contract = EVToken(token_address);
             token_contract.transfer_from_admin(msg.sender, 1);
-            emit AccessGranted(sub_id, obj_id, action);
+            emit AccessGranted(msg.sender, obj_addr, action);
         } else if (access == 1){
-            emit AccessDenied(sub_id, obj_id, action, "No Match Policy");
+            emit AccessDenied(msg.sender, obj_addr, action, "No Match Policy");
         } else if (access == 2){
-            emit AccessDenied(sub_id, obj_id, action, "Permission Restricted");
+            emit AccessDenied(msg.sender, obj_addr, action, "Permission Restricted");
         } else if (access == 3){
-            emit AccessDenied(sub_id, obj_id, action, "Access Time Out");
+            emit AccessDenied(msg.sender, obj_addr, action, "Access Time Out");
         } else if (access == 4){
-            emit AccessDenied(sub_id, obj_id, action, "Too Frequent Request");
+            emit AccessDenied(msg.sender, obj_addr, action, "Too Frequent Request");
         }
     }
 }

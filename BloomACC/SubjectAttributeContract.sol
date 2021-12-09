@@ -27,25 +27,25 @@ contract SubjectAttribute {
     uint256 num_subjects;
     BloomFilter filter;
 
-    mapping (uint256 => Subject) public subjects;
+    mapping (address => Subject) public subjects;
 
     // MODIFIERS
     modifier admin_only(){
         require(msg.sender == admin);
         _;
     }
-    modifier sub_active(uint256 sub_id){
-        require(subjects[sub_id].state == SubjectState.Active);
+    modifier sub_active(address sub_addr){
+        require(subjects[sub_addr].state == SubjectState.Active);
         _;
     }
-    modifier sub_not_deactivated(uint256 sub_id){
-        require(subjects[sub_id].state != SubjectState.Deactivated);
+    modifier sub_not_deactivated(address sub_addr){
+        require(subjects[sub_addr].state != SubjectState.Deactivated);
         _;
     }
 
     // EVENTS
-    event NewSubjectAdded(uint256 sub_id, string manufacturer);
-    event SubjectChanged(uint256 sub_id);
+    event NewSubjectAdded(address sub_addr, string manufacturer);
+    event SubjectChanged(address sub_addr);
 
     // FUNCTIONS
     constructor()
@@ -58,45 +58,45 @@ contract SubjectAttribute {
     
     // Adds a new subject with given attributes:
     // manufacturer, current_location, vehicle_type, charging_efficiency, discharging_efficiency, energy_capacity, ToMFR
-    // Emits NewSubjectAdded event with the sub_id
+    // Emits NewSubjectAdded event with the sub_addr and manufacturer
     function subject_add(
         /**SUBJECT ATTRIBUTES**/
+        address sub_addr,
         string[6] memory sub_arg
     )
         /**MODIFIERS**/
         public
         admin_only()
     {
-        uint256 sub_id = num_subjects;
         num_subjects++;
-        subjects[sub_id].state = SubjectState.Active;
-        // ADD MAIN ATTRIBS
-        subjects[sub_id].manufacturer = sub_arg[0];
-        subjects[sub_id].current_location = sub_arg[1];
-        subjects[sub_id].vehicle_type = sub_arg[2];
-        subjects[sub_id].charging_efficiency = sub_arg[3];
-        subjects[sub_id].discharging_efficiency = sub_arg[4];
-        subjects[sub_id].energy_capacity = sub_arg[5];
-        subjects[sub_id].ToMFR = 0;
+        subjects[sub_addr].state = SubjectState.Active;
+        // ADD SUBJECT ATTRIBS
+        subjects[sub_addr].manufacturer = sub_arg[0];
+        subjects[sub_addr].current_location = sub_arg[1];
+        subjects[sub_addr].vehicle_type = sub_arg[2];
+        subjects[sub_addr].charging_efficiency = sub_arg[3];
+        subjects[sub_addr].discharging_efficiency = sub_arg[4];
+        subjects[sub_addr].energy_capacity = sub_arg[5];
+        subjects[sub_addr].ToMFR = 0;
         // ADD SUBJECT TO BLOOMFILTER
-        add_bitmap(sub_id);
+        add_bitmap(sub_addr);
         // Emit event for new subject
-        emit NewSubjectAdded(sub_id, subjects[sub_id].manufacturer);
+        emit NewSubjectAdded(sub_addr, subjects[sub_addr].manufacturer);
     }
 
     // Adds a subject to bloom filter
     // By default hash_count is 5 in constructor
-    // hash_count is number of times the sub_id gets hashed
+    // hash_count is number of times the sub_addr gets hashed
     function add_bitmap(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         /**MODIFIERS**/
         internal
     {
         require(filter.hash_count > 0, "Hash count cannot be zero!");
         for(uint i = 0; i < filter.hash_count; i++) {
-            uint256 index = uint256(keccak256(abi.encodePacked(sub_id, i))) % 256;
+            uint256 index = uint256(keccak256(abi.encodePacked(sub_addr, i))) % 256;
             require(index < 256, "Overflow Error!");
             uint256 bit_place = 1 << index;
             filter.bitmap = filter.bitmap | bit_place;
@@ -107,51 +107,51 @@ contract SubjectAttribute {
     // Cannot reactivate once deleted
     function delete_subject(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         /**MODIFIERS**/
         public
         admin_only()
-        sub_not_deactivated(sub_id)
+        sub_not_deactivated(sub_addr)
     {
-        subjects[sub_id].state = SubjectState.Deactivated;
+        subjects[sub_addr].state = SubjectState.Deactivated;
     }
 
     // Sets subject to "suspended" mode
     // Use reactivate_subject function to reactivate subject
     function suspend_subject(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         /**MODIFIERS**/
         public
         admin_only()
-        sub_not_deactivated(sub_id)
+        sub_not_deactivated(sub_addr)
     {
-        subjects[sub_id].state = SubjectState.Suspended;
+        subjects[sub_addr].state = SubjectState.Suspended;
     }
     
     // Sets subject to "active" mode
     // Cannot be used if subject is "deactivated"
     function reactivate_subject(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         /**MODIFIERS**/
         public
         admin_only()
-        sub_not_deactivated(sub_id)
+        sub_not_deactivated(sub_addr)
     {
-        subjects[sub_id].state = SubjectState.Active;
+        subjects[sub_addr].state = SubjectState.Active;
     }
 
-    // Check the sub_id with the existing bloom filter
-    // to see if sub_id exists.
-    // Returns true if sub_id may exist
-    // Returns false if sub_id definitely doesn't exist
+    // Check the sub_addr with the existing bloom filter
+    // to see if sub_addr exists.
+    // Returns true if sub_addr may exist
+    // Returns false if sub_addr definitely doesn't exist
     function check_bitmap(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         /**MODIFIERS**/
         external
@@ -160,7 +160,7 @@ contract SubjectAttribute {
     {
         require(filter.hash_count > 0, "Hash count cannot be zero");
         for(uint256 i = 0; i < filter.hash_count; i++){
-            uint256 index = uint256(keccak256(abi.encodePacked(sub_id, i))) % 256;
+            uint256 index = uint256(keccak256(abi.encodePacked(sub_addr, i))) % 256;
             require(index < 256, "Overflow Error!");
             uint256 bit_place = 1 << index;
             if((filter.bitmap & bit_place) == 0) return false;
@@ -174,40 +174,40 @@ contract SubjectAttribute {
     // Emits SubjectChanged event
     function change_attribs(
         /**SUBJECT ID**/
-        uint256 sub_id,
+        address sub_addr,
         /**SUBJECT ATTRIBUTES**/
         string[6] memory sub_arg
     )
         /**MODIFIERS**/
         public
         admin_only()
-        sub_active(sub_id)
+        sub_active(sub_addr)
     {
         // CHANGE MAIN ATTRIBS
         bytes memory empty_test = bytes(sub_arg[0]);
-        if (empty_test.length != 0) subjects[sub_id].manufacturer = sub_arg[0];
+        if (empty_test.length != 0) subjects[sub_addr].manufacturer = sub_arg[0];
         empty_test = bytes(sub_arg[1]);
-        if (empty_test.length != 0) subjects[sub_id].current_location = sub_arg[1];
+        if (empty_test.length != 0) subjects[sub_addr].current_location = sub_arg[1];
         empty_test = bytes(sub_arg[2]);
-        if (empty_test.length != 0) subjects[sub_id].vehicle_type = sub_arg[2];
+        if (empty_test.length != 0) subjects[sub_addr].vehicle_type = sub_arg[2];
         empty_test = bytes(sub_arg[3]);
-        if (empty_test.length != 0) subjects[sub_id].charging_efficiency = sub_arg[3];
+        if (empty_test.length != 0) subjects[sub_addr].charging_efficiency = sub_arg[3];
         empty_test = bytes(sub_arg[4]);
-        if (empty_test.length != 0) subjects[sub_id].discharging_efficiency = sub_arg[4];
+        if (empty_test.length != 0) subjects[sub_addr].discharging_efficiency = sub_arg[4];
         empty_test = bytes(sub_arg[5]);
-        if (empty_test.length != 0) subjects[sub_id].energy_capacity = sub_arg[5];
-        emit SubjectChanged(sub_id);
+        if (empty_test.length != 0) subjects[sub_addr].energy_capacity = sub_arg[5];
+        emit SubjectChanged(sub_addr);
     }
 
     // Updates the Time of Most Frequent Request to
     // current time. To be used by the AccessControlContract.
     function update_tomfr(
         /**SUBJECT ID**/
-        uint256 sub_id
+        address sub_addr
     )
         external
-        sub_active(sub_id)
+        sub_active(sub_addr)
     {
-        subjects[sub_id].ToMFR = block.timestamp;
+        subjects[sub_addr].ToMFR = block.timestamp;
     }
 }

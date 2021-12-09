@@ -83,16 +83,16 @@ access_contract = w3.eth.contract(
 print("[WAITING] Listening for new events...")
 
 # HANDLE FUNCTIONS
-def handle_access(sub_id, obj_id, action, access, message):
+def handle_access(sub_addr, obj_addr, action, access, message):
     """
     Function to handle the event of a access request.
     If access is granted (access = 1) then prints success message
     If access is denied (access = 2) then prints failure message
     """
     if access == 1:
-        print(f'\n[SUCCESS] Access Granted!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}')
+        print(f'\n[SUCCESS] Access Granted!\nsub_addr: {sub_addr[-4:]}\nobj_addr:{obj_addr[-4:]}\naction:{action}')
     elif access == 2:
-        print(f'\n[FAILURE] Access Denied!\nsub_id: {sub_id}\nobj_id:{obj_id}\naction:{action}\nmessage: {message}')
+        print(f'\n[FAILURE] Access Denied!\nsub_addr: {sub_addr[-4:]}\nobj_addr:{obj_addr[-4:]}\naction:{action}\nmessage: {message}')
     else:
         print('\n[ERROR] INVALID ACCESS VARIABLE!')
         
@@ -104,19 +104,19 @@ def handle_new_pol(pol_id):
     """
     print(f'\nNew Policy Added! pol_id: {pol_id}')
 
-def handle_new_sub(sub_id, manufacturer):
+def handle_new_sub(sub_addr, manufacturer):
     """
     Function to handle the event of a new subject
-    being added and get the assigned sub_id
+    being added to blockchain mapping
     """
-    print(f'\nNew Subject Added! {manufacturer} with sub_id: {sub_id}')
+    print(f'\nNew Subject Added! {manufacturer} with sub_addr: {sub_addr[-4:]}')
 
-def handle_new_obj(obj_id, location):
+def handle_new_obj(obj_addr, location):
     """
     Function to handle the event of a new object
-    being added and get the assigned obj_id
+    being added to blockchain mapping
     """
-    print(f'\nNew Object Added! {location} with obj_id: {obj_id}')
+    print(f'\nNew Object Added! {location} with obj_addr: {obj_addr[-4:]}')
 
 def handle_transfer(owner, receiver, num_tokens, expiration_time):
     """
@@ -129,24 +129,24 @@ def handle_transfer(owner, receiver, num_tokens, expiration_time):
               \r\tAmount: {num_tokens}\n
               \r\tExpiration Time: {expiration_time}\n''')
     
-def handle_auth_succ(sub_id):
+def handle_auth_succ(sub_addr):
     """
     Function to handle the event of authentication success of a subject
     """
-    print(f'\nAuthentication Success: {sub_id}\n')
+    print(f'\nAuthentication Success: {sub_addr[-4:]}\n')
     
-def handle_auth_fail(sub_id):
+def handle_auth_fail(sub_addr):
     """
     Function to handle the event of authentication failure of a subject
     """
-    print(f'\nAuthentication Failure: {sub_id}\n')
+    print(f'\nAuthentication Failure: {sub_addr[-4:]}\n')
     
-def handle_sub_change(sub_id):
+def handle_sub_change(sub_addr):
     """
     Function to handle the event of subject attributes being changed
     """
     print(f'''\nSubject Attributes changed: 
-              \r\tSubject ID: {sub_id}\n''')
+              \r\tSubject ID: {sub_addr[-4:]}\n''')
     
 # ASYNC FUNCTIONS
 async def fail_loop(event_filter, poll_interval):
@@ -160,8 +160,8 @@ async def fail_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_access,
                 args = (
-                    access_denied['args']['sub_id'],
-                    access_denied['args']['obj_id'],
+                    access_denied['args']['sub_addr'],
+                    access_denied['args']['obj_addr'],
                     access_denied['args']['action'],
                     2,
                     access_denied['args']['message']
@@ -180,8 +180,8 @@ async def succ_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_access,
                 args = (
-                    access_granted['args']['sub_id'],
-                    access_granted['args']['obj_id'],
+                    access_granted['args']['sub_addr'],
+                    access_granted['args']['obj_addr'],
                     access_granted['args']['action'],
                     1,
                     ''
@@ -216,7 +216,7 @@ async def sub_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_new_sub,
                 args = (
-                    new_sub_added['args']['sub_id'],
+                    new_sub_added['args']['sub_addr'],
                     new_sub_added['args']['manufacturer']
                 ))
             thread.start()
@@ -233,7 +233,7 @@ async def obj_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_new_obj,
                 args = (
-                    new_obj_added['args']['obj_id'],
+                    new_obj_added['args']['obj_addr'],
                     new_obj_added['args']['location']
                 ))
             thread.start()
@@ -250,7 +250,7 @@ async def auth_success_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_auth_succ,
                 args = (
-                    success['args']['sub_id'],
+                    success['args']['sub_addr'],
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -266,7 +266,7 @@ async def auth_fail_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_auth_fail,
                 args = (
-                    failure['args']['sub_id'],
+                    failure['args']['sub_addr'],
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)
@@ -301,7 +301,7 @@ async def sub_change_loop(event_filter, poll_interval):
             thread = threading.Thread(
                 target = handle_sub_change,
                 args = (
-                    change['args']['sub_id'],
+                    change['args']['sub_addr'],
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)

@@ -34,12 +34,12 @@ subject_contract = w3.eth.contract(
 #   discharging_efficiency, energy_capacity, ToMFR
 
 # Send subject function to send subject_add transaction
-def send_subject(subject):
+def send_subject(address, subject):
     """
     Function which is used as a target for threading to send
     transactions to add new subjects to SubjectAttributeContract
     """
-    tx_hash = subject_contract.functions.subject_add(subject.split(';')).transact()
+    tx_hash = subject_contract.functions.subject_add(address, subject.split(';')).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f"[SUCCESS] Added subject {subject.split(';')[0]}")
 
@@ -49,14 +49,14 @@ with open('subjects.txt', 'r') as file_obj:
 
 # For every subject in sub_info send subject_add transaction 
 threads = []
-for subject in sub_info:
+for index, subject in enumerate(sub_info):
     # Remove \n at the end of each string if it exists
     if subject[-1] == '\n':
         subject = subject[:-1]
     # Create a new thread for every subject
     thread = threading.Thread(
         target = send_subject,
-        args = (subject,)
+        args = (w3.eth.accounts[1 + index], subject)
     )
     # Add thread to threads list 
     threads.append(thread)
@@ -67,6 +67,6 @@ for thread in threads:
 for thread in threads:
     thread.join()
 # Call subjects abi to confirm that every subject was added successfully.
-for i in range(len(sub_info)):
-    print('Subject:\n\t', subject_contract.functions.subjects(i).call())
+for address in w3.eth.accounts[1:6]:
+    print('Subject:\n\t', subject_contract.functions.subjects(address).call())
 print('\n[ADD SUBJECTS][SUCCESS] Transactions Successful\n')

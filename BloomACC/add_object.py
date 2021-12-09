@@ -34,12 +34,12 @@ object_contract = w3.eth.contract(
 #   Charging Power, Utilization Rate
 
 # Send object function to send object_add transaction
-def send_object(object):
+def send_object(address, object):
     """
     Function which is used as a target for threading to send
     transactions to add new objects to ObjectAttributeContract
     """
-    tx_hash = object_contract.functions.object_add(object.split(';')).transact()
+    tx_hash = object_contract.functions.object_add(address, object.split(';')).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f"[SUCCESS] Added object {object.split(';')[1]}")
 
@@ -49,14 +49,14 @@ with open('objects.txt', 'r') as file_obj:
 
 # For every object in obj_info send object_add transaction 
 threads = []
-for obj in obj_info:
+for index, obj in enumerate(obj_info):
     # Remove \n at the end of each string if it exists
     if obj[-1] == '\n':
         obj = obj[:-1]
     # Create a new thread for every object
     thread = threading.Thread(
         target = send_object,
-        args = (obj,)
+        args = (w3.eth.accounts[6 + index], obj)
     )
     # Add thread to threads list
     threads.append(thread)
@@ -67,6 +67,6 @@ for thread in threads:
 for thread in threads:
     thread.join()
 # Call objects abi to confirm that every object was added successfully.
-for i in range(len(obj_info)):
-    print('Object:\n\t', object_contract.functions.objects(i).call())
+for address in w3.eth.accounts[6:]:
+    print('Object:\n\t', object_contract.functions.objects(address).call())
 print('\n[ADD OBJECTS][SUCCESS] Transactions Successful\n')
