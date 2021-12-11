@@ -29,11 +29,11 @@ policy_contract = w3.eth.contract(
 )
 # --------------------------MAIN PROGRAM----------------------------
 # Policy Content:
-# Subject = (Manufacturer, current_location, vehicle_type, charging_efficiency, discharging_efficiency, energy_capacity, ToMFR)
-# Object = (Avg. Waiting Time, Location, Avg. charging time, number of charging outlets, Charging Power, Utilization Rate)
+# Subject = (Manufacturer, Current Location, Vehicle Type, Owner Name, License Plate Number, Energy Capacity, ToMFR)
+# Object = (Plug Type, Location, Pricing Model, Number of Charging Outlets, Charging Power, Fast Charging)
 # Action = (read, write, execute)
 # Context = (min_interval, start_time, end_time)
-# policy add ABI expects 4 inputs: subject list, object list, action list, context list
+# policy_add ABI expects 4 inputs: subject list, object list, action list, context list
 
 # Send policy function to send policy_add transaction
 def send_policy(policy):

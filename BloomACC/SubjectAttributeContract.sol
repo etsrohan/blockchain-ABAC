@@ -11,8 +11,8 @@ contract SubjectAttribute {
         string manufacturer;
         string current_location;
         string vehicle_type;
-        string charging_efficiency;
-        string discharging_efficiency;
+        string owner_name;
+        string license_plate;
         string energy_capacity;
         uint256 ToMFR;
     }
@@ -74,8 +74,8 @@ contract SubjectAttribute {
         subjects[sub_addr].manufacturer = sub_arg[0];
         subjects[sub_addr].current_location = sub_arg[1];
         subjects[sub_addr].vehicle_type = sub_arg[2];
-        subjects[sub_addr].charging_efficiency = sub_arg[3];
-        subjects[sub_addr].discharging_efficiency = sub_arg[4];
+        subjects[sub_addr].owner_name = sub_arg[3];
+        subjects[sub_addr].license_plate = sub_arg[4];
         subjects[sub_addr].energy_capacity = sub_arg[5];
         subjects[sub_addr].ToMFR = 0;
         // ADD SUBJECT TO BLOOMFILTER
@@ -191,9 +191,9 @@ contract SubjectAttribute {
         empty_test = bytes(sub_arg[2]);
         if (empty_test.length != 0) subjects[sub_addr].vehicle_type = sub_arg[2];
         empty_test = bytes(sub_arg[3]);
-        if (empty_test.length != 0) subjects[sub_addr].charging_efficiency = sub_arg[3];
+        if (empty_test.length != 0) subjects[sub_addr].owner_name = sub_arg[3];
         empty_test = bytes(sub_arg[4]);
-        if (empty_test.length != 0) subjects[sub_addr].discharging_efficiency = sub_arg[4];
+        if (empty_test.length != 0) subjects[sub_addr].license_plate = sub_arg[4];
         empty_test = bytes(sub_arg[5]);
         if (empty_test.length != 0) subjects[sub_addr].energy_capacity = sub_arg[5];
         emit SubjectChanged(sub_addr);

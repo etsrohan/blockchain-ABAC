@@ -30,8 +30,8 @@ object_contract = w3.eth.contract(
 
 # --------------------------MAIN PROGRAM----------------------------
 # Object Attributes:
-#   Avg. Waiting Time, Location, Avg. charging time, number of charging outlets
-#   Charging Power, Utilization Rate
+#   Plug Type, Location, Pricing Model, Number of Charging Outlets
+#   Charging Power, Fast Charging
 
 # Send object function to send object_add transaction
 def send_object(address, object):

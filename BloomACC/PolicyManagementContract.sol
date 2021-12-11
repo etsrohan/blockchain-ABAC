@@ -8,12 +8,12 @@ contract PolicyManagement {
     // STRUCTS
     // Object Attributes
     struct Object{
-        string avg_wait_time;
+        string plug_type;
         string location;
-        string avg_charging_time;
+        string pricing_model;
         string num_charging_outlets;
         string charging_power;
-        string utilization_rate;
+        string fast_charging;
     }
 
     // Subject Attributes
@@ -21,8 +21,8 @@ contract PolicyManagement {
         string manufacturer;
         string current_location;
         string vehicle_type;
-        string charging_efficiency;
-        string discharging_efficiency;
+        string owner_name;
+        string license_plate;
         string energy_capacity;
     }
 
@@ -250,16 +250,16 @@ contract PolicyManagement {
             if (keccak256(abi.encodePacked(policies[count].subject.manufacturer))          != keccak256(abi.encodePacked(sub_arg[0]))) continue;
             if (keccak256(abi.encodePacked(policies[count].subject.current_location))      != keccak256(abi.encodePacked(sub_arg[1]))) continue;
             if (keccak256(abi.encodePacked(policies[count].subject.vehicle_type))          != keccak256(abi.encodePacked(sub_arg[2]))) continue;
-            if (keccak256(abi.encodePacked(policies[count].subject.charging_efficiency))   != keccak256(abi.encodePacked(sub_arg[3]))) continue;
-            if (keccak256(abi.encodePacked(policies[count].subject.discharging_efficiency))!= keccak256(abi.encodePacked(sub_arg[4]))) continue;
+            if (keccak256(abi.encodePacked(policies[count].subject.owner_name))            != keccak256(abi.encodePacked(sub_arg[3]))) continue;
+            if (keccak256(abi.encodePacked(policies[count].subject.license_plate))         != keccak256(abi.encodePacked(sub_arg[4]))) continue;
             if (keccak256(abi.encodePacked(policies[count].subject.energy_capacity))       != keccak256(abi.encodePacked(sub_arg[5]))) continue;
             // Object Comparison
-            if (keccak256(abi.encodePacked(policies[count].object.avg_wait_time))          != keccak256(abi.encodePacked(obj_arg[0]))) continue;
+            if (keccak256(abi.encodePacked(policies[count].object.plug_type))              != keccak256(abi.encodePacked(obj_arg[0]))) continue;
             if (keccak256(abi.encodePacked(policies[count].object.location))               != keccak256(abi.encodePacked(obj_arg[1]))) continue;
-            if (keccak256(abi.encodePacked(policies[count].object.avg_charging_time))      != keccak256(abi.encodePacked(obj_arg[2]))) continue;
+            if (keccak256(abi.encodePacked(policies[count].object.pricing_model))          != keccak256(abi.encodePacked(obj_arg[2]))) continue;
             if (keccak256(abi.encodePacked(policies[count].object.num_charging_outlets))   != keccak256(abi.encodePacked(obj_arg[3]))) continue;
             if (keccak256(abi.encodePacked(policies[count].object.charging_power))         != keccak256(abi.encodePacked(obj_arg[4]))) continue;
-            if (keccak256(abi.encodePacked(policies[count].object.utilization_rate))       != keccak256(abi.encodePacked(obj_arg[5]))) continue;
+            if (keccak256(abi.encodePacked(policies[count].object.fast_charging))          != keccak256(abi.encodePacked(obj_arg[5]))) continue;
             // Set ret as count and end loop
             ret = int(count);
             break;
@@ -308,12 +308,12 @@ contract PolicyManagement {
                 (keccak256(abi.encodePacked(policies[count].subject.vehicle_type)) != keccak256(abi.encodePacked(sub_arg[2])))) continue;
 
             if ((keccak256(abi.encodePacked(sub_arg[3])) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].subject.charging_efficiency)) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].subject.charging_efficiency)) != keccak256(abi.encodePacked(sub_arg[3])))) continue;
+                (keccak256(abi.encodePacked(policies[count].subject.owner_name)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.owner_name)) != keccak256(abi.encodePacked(sub_arg[3])))) continue;
 
             if ((keccak256(abi.encodePacked(sub_arg[4])) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].subject.discharging_efficiency)) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].subject.discharging_efficiency)) != keccak256(abi.encodePacked(sub_arg[4])))) continue;
+                (keccak256(abi.encodePacked(policies[count].subject.license_plate)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].subject.license_plate)) != keccak256(abi.encodePacked(sub_arg[4])))) continue;
 
             if ((keccak256(abi.encodePacked(sub_arg[5])) != keccak256(abi.encodePacked(""))) && 
                 (keccak256(abi.encodePacked(policies[count].subject.energy_capacity)) != keccak256(abi.encodePacked(""))) && 
@@ -321,16 +321,16 @@ contract PolicyManagement {
 
             // Object Comparison
             if ((keccak256(abi.encodePacked(obj_arg[0])) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.avg_wait_time)) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.avg_wait_time)) != keccak256(abi.encodePacked(obj_arg[0])))) continue;
+                (keccak256(abi.encodePacked(policies[count].object.plug_type)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.plug_type)) != keccak256(abi.encodePacked(obj_arg[0])))) continue;
 
             if ((keccak256(abi.encodePacked(obj_arg[1])) != keccak256(abi.encodePacked(""))) && 
                 (keccak256(abi.encodePacked(policies[count].object.location)) != keccak256(abi.encodePacked(""))) && 
                 (keccak256(abi.encodePacked(policies[count].object.location)) != keccak256(abi.encodePacked(obj_arg[1])))) continue;
 
             if ((keccak256(abi.encodePacked(obj_arg[2])) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.avg_charging_time)) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.avg_charging_time)) != keccak256(abi.encodePacked(obj_arg[2])))) continue;
+                (keccak256(abi.encodePacked(policies[count].object.pricing_model)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.pricing_model)) != keccak256(abi.encodePacked(obj_arg[2])))) continue;
 
             if ((keccak256(abi.encodePacked(obj_arg[3])) != keccak256(abi.encodePacked(""))) && 
                 (keccak256(abi.encodePacked(policies[count].object.num_charging_outlets)) != keccak256(abi.encodePacked(""))) && 
@@ -341,8 +341,8 @@ contract PolicyManagement {
                 (keccak256(abi.encodePacked(policies[count].object.charging_power)) != keccak256(abi.encodePacked(obj_arg[4])))) continue;
 
             if ((keccak256(abi.encodePacked(obj_arg[5])) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.utilization_rate)) != keccak256(abi.encodePacked(""))) && 
-                (keccak256(abi.encodePacked(policies[count].object.utilization_rate)) != keccak256(abi.encodePacked(obj_arg[5])))) continue;
+                (keccak256(abi.encodePacked(policies[count].object.fast_charging)) != keccak256(abi.encodePacked(""))) && 
+                (keccak256(abi.encodePacked(policies[count].object.fast_charging)) != keccak256(abi.encodePacked(obj_arg[5])))) continue;
 
             // Add entry to list of similar policies
             ret_list.push(count);

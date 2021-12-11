@@ -8,12 +8,12 @@ contract ObjectAttribute {
     // STRUCTS
     struct Object{
         ObjectState state;
-        string avg_wait_time;
+        string plug_type;
         string location;
-        string avg_charging_time;
+        string pricing_model;
         string num_charging_outlets;
         string charging_power;
-        string utilization_rate;
+        string fast_charging;
     }
 
     // VARIABLES
@@ -62,12 +62,12 @@ contract ObjectAttribute {
         num_objects++;
         objects[obj_addr].state = ObjectState.Active;
         // ADD MAIN ATTRIBS
-        objects[obj_addr].avg_wait_time = obj_arg[0];
+        objects[obj_addr].plug_type = obj_arg[0];
         objects[obj_addr].location = obj_arg[1];
-        objects[obj_addr].avg_charging_time = obj_arg[2];
+        objects[obj_addr].pricing_model = obj_arg[2];
         objects[obj_addr].num_charging_outlets = obj_arg[3];
         objects[obj_addr].charging_power = obj_arg[4];
-        objects[obj_addr].utilization_rate = obj_arg[5];
+        objects[obj_addr].fast_charging = obj_arg[5];
         emit NewObjectAdded(obj_addr, objects[obj_addr].location);
     }
 
@@ -131,17 +131,17 @@ contract ObjectAttribute {
         // CHANGE MAIN ATTRIBS
         // Check for empty field, if empty don't change
         bytes memory empty_test = bytes(obj_arg[0]);
-        if (empty_test.length != 0) objects[obj_addr].avg_wait_time = obj_arg[0];
+        if (empty_test.length != 0) objects[obj_addr].plug_type = obj_arg[0];
         empty_test = bytes(obj_arg[1]);
         if (empty_test.length != 0) objects[obj_addr].location = obj_arg[1];
         empty_test = bytes(obj_arg[2]);
-        if (empty_test.length != 0) objects[obj_addr].avg_charging_time = obj_arg[2];
+        if (empty_test.length != 0) objects[obj_addr].pricing_model = obj_arg[2];
         empty_test = bytes(obj_arg[3]);
         if (empty_test.length != 0) objects[obj_addr].num_charging_outlets = obj_arg[3];
         empty_test = bytes(obj_arg[4]);
         if (empty_test.length != 0) objects[obj_addr].charging_power = obj_arg[4];
         empty_test = bytes(obj_arg[5]);
-        if (empty_test.length != 0) objects[obj_addr].utilization_rate = obj_arg[5];
+        if (empty_test.length != 0) objects[obj_addr].fast_charging = obj_arg[5];
 
         // Emit event for successful object attribute change 
         emit ObjectChanged(obj_addr);

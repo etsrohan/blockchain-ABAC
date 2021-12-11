@@ -3,6 +3,7 @@ from web3 import Web3
 import threading
 import json
 import asyncio
+import time
 
 # Connect to Ganache
 GANACHE_URL = 'HTTP://127.0.0.1:7545'
@@ -90,9 +91,9 @@ def handle_access(sub_addr, obj_addr, action, access, message):
     If access is denied (access = 2) then prints failure message
     """
     if access == 1:
-        print(f'\n[SUCCESS] Access Granted!\nsub_addr: {sub_addr[-4:]}\nobj_addr:{obj_addr[-4:]}\naction:{action}')
+        print(f'\n[SUCCESS] Access Granted!\nsub_addr: 0x...{sub_addr[-4:]}\nobj_addr: 0x...{obj_addr[-4:]}\naction: {action}')
     elif access == 2:
-        print(f'\n[FAILURE] Access Denied!\nsub_addr: {sub_addr[-4:]}\nobj_addr:{obj_addr[-4:]}\naction:{action}\nmessage: {message}')
+        print(f'\n[FAILURE] Access Denied!\nsub_addr: 0x...{sub_addr[-4:]}\nobj_addr: 0x...{obj_addr[-4:]}\naction: {action}\nmessage: {message}')
     else:
         print('\n[ERROR] INVALID ACCESS VARIABLE!')
         
@@ -109,14 +110,14 @@ def handle_new_sub(sub_addr, manufacturer):
     Function to handle the event of a new subject
     being added to blockchain mapping
     """
-    print(f'\nNew Subject Added! {manufacturer} with sub_addr: {sub_addr[-4:]}')
+    print(f'\nNew Subject Added! {manufacturer} with sub_addr: 0x...{sub_addr[-4:]}')
 
 def handle_new_obj(obj_addr, location):
     """
     Function to handle the event of a new object
     being added to blockchain mapping
     """
-    print(f'\nNew Object Added! {location} with obj_addr: {obj_addr[-4:]}')
+    print(f'\nNew Object Added! {location} with obj_addr: 0x...{obj_addr[-4:]}')
 
 def handle_transfer(owner, receiver, num_tokens, expiration_time):
     """
@@ -127,26 +128,26 @@ def handle_transfer(owner, receiver, num_tokens, expiration_time):
               \r\tSubject: 0x...{receiver[-4:]}\n
               \r\tAdmin: 0x...{owner[-4:]}\n
               \r\tAmount: {num_tokens}\n
-              \r\tExpiration Time: {expiration_time}\n''')
+              \r\tExpiration Time: {time.ctime(expiration_time)}\n''')
     
 def handle_auth_succ(sub_addr):
     """
     Function to handle the event of authentication success of a subject
     """
-    print(f'\nAuthentication Success: {sub_addr[-4:]}\n')
+    print(f'\nAuthentication Success: 0x...{sub_addr[-4:]}\n')
     
 def handle_auth_fail(sub_addr):
     """
     Function to handle the event of authentication failure of a subject
     """
-    print(f'\nAuthentication Failure: {sub_addr[-4:]}\n')
+    print(f'\nAuthentication Failure: 0x...{sub_addr[-4:]}\n')
     
 def handle_sub_change(sub_addr):
     """
     Function to handle the event of subject attributes being changed
     """
     print(f'''\nSubject Attributes changed: 
-              \r\tSubject ID: {sub_addr[-4:]}\n''')
+              \r\tSubject Address: 0x...{sub_addr[-4:]}\n''')
     
 # ASYNC FUNCTIONS
 async def fail_loop(event_filter, poll_interval):
