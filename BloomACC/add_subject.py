@@ -11,7 +11,7 @@ if w3.isConnected():
     print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
 
 # set first account as default user or "Administrator"
-w3.eth.default_account = w3.eth.accounts[0]
+w3.eth.default_account = w3.eth.accounts[11]
 
 with open('SubjectAttribute.contract', 'r') as file_obj:
     subject_info = file_obj.readlines()
@@ -39,9 +39,12 @@ def send_subject(address, subject):
     Function which is used as a target for threading to send
     transactions to add new subjects to SubjectAttributeContract
     """
-    tx_hash = subject_contract.functions.subject_add(address, subject.split(';')).transact()
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    print(f"[SUCCESS] Added subject {subject.split(';')[0]}")
+    try:
+        tx_hash = subject_contract.functions.subject_add(address, subject.split(';')).transact()
+        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+        print(f"[SUCCESS] Added subject {subject.split(';')[0]}")
+    except Exception as err:
+        print('{ERROR] Remember to add EV Manufacturers to the Subject Contract!')
 
 # Get subjects data from subjects.txt
 with open('subjects.txt', 'r') as file_obj:

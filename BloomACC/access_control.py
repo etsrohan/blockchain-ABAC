@@ -57,15 +57,16 @@ location = input('Please enter your location: ')
 attrib_list = ['' for _ in range(6)]
 attrib_list[1] = location
 
-# set default account as admin
-w3.eth.default_account = w3.eth.accounts[0]
+# set default account to manufacturer
+w3.eth.default_account = w3.eth.accounts[11]
 
 try:
     tx_hash = subject_contract.functions.change_attribs(sub_addr, attrib_list).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     print(f'Sent change location request for subject: {sub_addr[-4:]}')
 except Exception as err:
-        print(f'[ERROR] Subject with address ({sub_addr[-4:]}) does not exist.\n{err}')
+        print(f'''[ERROR] Subject with address ({sub_addr[-4:]}) does not exist.\n{err}
+              \n\rOr Make sure you have permissions to change attributes.''')
 
 # set default account as access sender
 w3.eth.default_account = sub_addr

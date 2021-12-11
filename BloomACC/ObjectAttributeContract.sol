@@ -19,6 +19,7 @@ contract ObjectAttribute {
     // VARIABLES
     address admin;
     uint256 num_objects;
+    address[] cs_leaders;
 
     mapping (address => Object) public objects;
 
@@ -33,6 +34,14 @@ contract ObjectAttribute {
     }
     modifier obj_not_deactivated(address obj_addr){
         require(objects[obj_addr].state != ObjectState.Deactivated);
+        _;
+    }
+    modifier cs_leader_only(){
+        bool cs_lead = false;
+        for (uint8 i = 0; i < cs_leaders.length; i++){
+            if (msg.sender == cs_leaders[i]) cs_lead = true;
+        }
+        require (cs_lead);
         _;
     }
 
@@ -57,7 +66,7 @@ contract ObjectAttribute {
     )
         /**MODIFIERS**/
         public
-        admin_only()
+        cs_leader_only()
     {
         num_objects++;
         objects[obj_addr].state = ObjectState.Active;
@@ -125,7 +134,7 @@ contract ObjectAttribute {
     )
         /**MODIFIERS**/
         public
-        admin_only()
+        cs_leader_only()
         obj_active(obj_addr)
     {
         // CHANGE MAIN ATTRIBS
@@ -145,5 +154,17 @@ contract ObjectAttribute {
 
         // Emit event for successful object attribute change 
         emit ObjectChanged(obj_addr);
+    }
+
+    // Adds a trusted CS Leader to add/change the
+    // object attributes.
+    function add_cs_leader(
+        /**CS LEADER ADDRESS**/
+        address cs_lead
+    )
+        public
+        admin_only()
+    {
+        cs_leaders.push(cs_lead);
     }
 }

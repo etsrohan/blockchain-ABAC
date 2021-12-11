@@ -26,6 +26,7 @@ contract SubjectAttribute {
     address admin;
     uint256 num_subjects;
     BloomFilter filter;
+    address[] ev_manufacturers;
 
     mapping (address => Subject) public subjects;
 
@@ -40,6 +41,14 @@ contract SubjectAttribute {
     }
     modifier sub_not_deactivated(address sub_addr){
         require(subjects[sub_addr].state != SubjectState.Deactivated);
+        _;
+    }
+    modifier manufacturers_only(){
+        bool man = false;
+        for (uint8 i = 0; i < ev_manufacturers.length; i++){
+            if (msg.sender == ev_manufacturers[i]) man = true;
+        }
+        require (man);
         _;
     }
 
@@ -66,7 +75,7 @@ contract SubjectAttribute {
     )
         /**MODIFIERS**/
         public
-        admin_only()
+        manufacturers_only()
     {
         num_subjects++;
         subjects[sub_addr].state = SubjectState.Active;
@@ -180,7 +189,7 @@ contract SubjectAttribute {
     )
         /**MODIFIERS**/
         public
-        admin_only()
+        manufacturers_only()
         sub_active(sub_addr)
     {
         // CHANGE MAIN ATTRIBS
@@ -209,5 +218,17 @@ contract SubjectAttribute {
         sub_active(sub_addr)
     {
         subjects[sub_addr].ToMFR = block.timestamp;
+    }
+
+    // Adds a trusted manufacturer to add/change the
+    // subject attributes.
+    function add_ev_man(
+        /**MANUFACTURER ADDRESS**/
+        address ev_man
+    )
+        public
+        admin_only()
+    {
+        ev_manufacturers.push(ev_man);
     }
 }

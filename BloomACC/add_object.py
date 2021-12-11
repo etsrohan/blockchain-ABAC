@@ -11,7 +11,7 @@ if w3.isConnected():
     print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
 
 # set first account as default user or "Administrator"
-w3.eth.default_account = w3.eth.accounts[0]
+w3.eth.default_account = w3.eth.accounts[13]
 
 with open('ObjectAttribute.contract', 'r') as file_obj:
     object_info = file_obj.readlines()
@@ -67,6 +67,6 @@ for thread in threads:
 for thread in threads:
     thread.join()
 # Call objects abi to confirm that every object was added successfully.
-for address in w3.eth.accounts[6:]:
+for address in w3.eth.accounts[6:11]:
     print('Object:\n\t', object_contract.functions.objects(address).call())
 print('\n[ADD OBJECTS][SUCCESS] Transactions Successful\n')
