@@ -13,7 +13,7 @@ if w3.isConnected():
 # set first account as default user or "Administrator"
 w3.eth.default_account = w3.eth.accounts[11]
 
-with open('SubjectAttribute.contract', 'r') as file_obj:
+with open('Info/SubjectAttribute.contract', 'r') as file_obj:
     subject_info = file_obj.readlines()
 
 # print(subject_info)
@@ -47,7 +47,7 @@ def send_subject(address, subject):
         print('{ERROR] Remember to add EV Manufacturers to the Subject Contract!')
 
 # Get subjects data from subjects.txt
-with open('subjects.txt', 'r') as file_obj:
+with open('Attributes/subjects.txt', 'r') as file_obj:
     sub_info = file_obj.readlines()
 
 # For every subject in sub_info send subject_add transaction 

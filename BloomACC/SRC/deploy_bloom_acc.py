@@ -7,7 +7,7 @@ import json
 # Getting current working directory (cwd)
 cwd = os.getcwd()
 # Compile ABAC Contracts
-compiled_sol = compile_files([cwd + '/AccessControlContract.sol'])
+compiled_sol = compile_files([cwd + '/Contracts/AccessControlContract.sol'])
 
 # Some important exploration
 # print(os.getcwd())
@@ -160,10 +160,19 @@ CONTRACT_ADDRESS.append(tx_receipt.contractAddress)
 print(f"[SUCCESS] {CONTRACT_NAME[-1]} Successfully Deployed!!!")
 print(f"[INFO] Contract Address: {CONTRACT_ADDRESS[-1]}\n")
 
+try:
+    folder = 'Info'
+    print(f"[CREATING] Folder called '{folder}'")
+    os.mkdir(folder)
+except FileExistsError as err:
+    print(f'[ERROR] {folder} already exists!')
+    print(f'{err}\n')
+    
+
 # Save Contract Info
 for index, name in enumerate(CONTRACT_NAME):
     print(f'[SAVING] {name}')
-    with open(f'{name}.contract', 'w') as file_object:
+    with open(f'Info/{name}.contract', 'w') as file_object:
         file_object.write(CONTRACT_ADDRESS[index])
         file_object.write('\n')
         file_object.write(json.dumps(ABI[index]))

@@ -13,7 +13,7 @@ if w3.isConnected():
 # set first account as default user or "Administrator"
 w3.eth.default_account = w3.eth.accounts[13]
 
-with open('ObjectAttribute.contract', 'r') as file_obj:
+with open('Info/ObjectAttribute.contract', 'r') as file_obj:
     object_info = file_obj.readlines()
 
 # print(object_info)
@@ -44,7 +44,7 @@ def send_object(address, object):
     print(f"[SUCCESS] Added object {object.split(';')[1]}")
 
 # Get objects data from objects.txt
-with open('objects.txt', 'r') as file_obj:
+with open('Attributes/objects.txt', 'r') as file_obj:
     obj_info = file_obj.readlines()
 
 # For every object in obj_info send object_add transaction 

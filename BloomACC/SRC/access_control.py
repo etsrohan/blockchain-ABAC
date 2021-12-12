@@ -11,10 +11,10 @@ if w3.isConnected():
     print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
 
 # Open and get Access ABI/Address
-with open('AccessControl.contract', 'r') as file_obj:
+with open('Info/AccessControl.contract', 'r') as file_obj:
     access_info = file_obj.readlines()
 # Open and get SubjectContract ABI/Address
-with open('SubjectAttribute.contract', 'r') as file_obj:
+with open('Info/SubjectAttribute.contract', 'r') as file_obj:
     subject_info = file_obj.readlines()
 
 # print(object_info)

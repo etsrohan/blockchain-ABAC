@@ -13,7 +13,7 @@ if w3.isConnected():
 # set first account as default user or "Administrator"
 w3.eth.default_account = w3.eth.accounts[0]
 
-with open('SubjectAttribute.contract', 'r') as file_obj:
+with open('Info/SubjectAttribute.contract', 'r') as file_obj:
     subject_info = file_obj.readlines()
 
 # print(subject_info)
@@ -29,17 +29,10 @@ subject_contract = w3.eth.contract(
 )
 
 # --------------------------MAIN PROGRAM----------------------------
-# Subject Attributes:
-#   Manufacturer, current_location, vehicle_type, charging_efficiency
-#   discharging_efficiency, energy_capacity, ToMFR
 
-sub_id = int(input('Please enter your subject id: '))
-location = input('Please enter your location: ')
-attrib_list = ['' for _ in range(6)]
-attrib_list[1] = location
-
-tx_hash = subject_contract.functions.change_attribs(sub_id, attrib_list).transact()
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-print(f'''Subject attributes:
-      \r\t{subject_contract.functions.subjects(sub_id).call()}''')
+# Send a transaction to add the 2 manufacturers index 11, 12
+for address in w3.eth.accounts[11:13]:
+    print(f'[Admin] Adding EV Manufacturer 0x...{address[-4:]}')
+    tx_hash = subject_contract.functions.add_ev_man(address).transact()
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+print('[SUCCESS] EV Manufacturers added!')

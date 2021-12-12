@@ -16,35 +16,35 @@ if w3.isConnected():
 w3.eth.default_account = w3.eth.accounts[0]
 
 # Open and get Object ABI/Address
-with open('ObjectAttribute.contract', 'r') as file_obj:
+with open('Info/ObjectAttribute.contract', 'r') as file_obj:
     object_info = file_obj.readlines()
 # Get address/abi for object contract
 object_address = object_info[0][:-1]
 object_abi = json.loads(object_info[1])
 
 # Open and get Subject ABI/Address
-with open('SubjectAttribute.contract', 'r') as file_obj:
+with open('Info/SubjectAttribute.contract', 'r') as file_obj:
     subject_info = file_obj.readlines()
 # Get address/abi for subject contract
 subject_address = subject_info[0][:-1]
 subject_abi = json.loads(subject_info[1])
 
 # Open and get Policy ABI/Address
-with open('PolicyManagement.contract', 'r') as file_obj:
+with open('Info/PolicyManagement.contract', 'r') as file_obj:
     policy_info = file_obj.readlines()
 # Get address/abi for policy contract
 policy_address = policy_info[0][:-1]
 policy_abi = json.loads(policy_info[1])
 
 # Open and get Token ABI/Address
-with open('EVToken.contract', 'r') as file_obj:
+with open('Info/EVToken.contract', 'r') as file_obj:
     token_info = file_obj.readlines()
 # Get address/abi for token contract
 token_address = token_info[0][:-1]
 token_abi = json.loads(token_info[1])
 
 # Open and get Access ABI/Address
-with open('AccessControl.contract', 'r') as file_obj:
+with open('Info/AccessControl.contract', 'r') as file_obj:
     access_info = file_obj.readlines()
 # Get address/abi for access contract
 access_address = access_info[0][:-1]

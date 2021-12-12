@@ -12,7 +12,7 @@ if w3.isConnected():
 # set first account as default user or "Administrator"
 w3.eth.default_account = w3.eth.accounts[0]
 
-with open('EVToken.contract', 'r') as file_obj:
+with open('Info/EVToken.contract', 'r') as file_obj:
     token_info = file_obj.readlines()
 
 # print(token_info)
@@ -28,7 +28,7 @@ token_contract = w3.eth.contract(
 )
 
 # Get the AccessControl Contract address
-with open('AccessControl.contract', 'r') as file_obj:
+with open('Info/AccessControl.contract', 'r') as file_obj:
     access_info = file_obj.readlines()
 
 access_address = access_info[0][:-1]
