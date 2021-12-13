@@ -119,7 +119,7 @@ def handle_new_obj(obj_addr, location):
     """
     print(f'\nNew Object Added! {location} with obj_addr: 0x...{obj_addr[-4:]}')
 
-def handle_transfer(owner, receiver, num_tokens, expiration_time):
+def handle_transfer(owner, receiver, num_tokens, expiration_time, generation_time):
     """
     Function to handle the event of a new transfer of EVToken
     from an owner to a receiver, num_tokens is the number of tokens transferred
@@ -128,7 +128,8 @@ def handle_transfer(owner, receiver, num_tokens, expiration_time):
               \r\tSubject: 0x...{receiver[-4:]}\n
               \r\tAdmin: 0x...{owner[-4:]}\n
               \r\tAmount: {num_tokens}\n
-              \r\tExpiration Time: {time.ctime(expiration_time)}\n''')
+              \r\tExpiration Time: {time.ctime(expiration_time)}\n
+              \r\tGeneration Time: {time.ctime(generation_time)}\n''')
     
 def handle_auth_succ(sub_addr):
     """
@@ -286,7 +287,8 @@ async def transfer_loop(event_filter, poll_interval):
                     new_transfer['args']['admin'],
                     new_transfer['args']['receiver'],
                     new_transfer['args']['num_tokens'],
-                    new_transfer['args']['expiration_time']
+                    new_transfer['args']['expiration_time'],
+                    new_transfer['args']['generation_time']
                 ))
             thread.start()
         await asyncio.sleep(poll_interval)

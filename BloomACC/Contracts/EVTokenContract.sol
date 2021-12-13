@@ -34,7 +34,7 @@ contract EVToken {
     // EVENTS
     event Transfer(address indexed sender, address indexed receiver, uint256 num_tokens);
     event Approval(address indexed owner, address indexed delegate, uint256 num_tokens);
-    event AdminTransfer(address indexed admin, address indexed receiver, uint256 num_tokens, uint256 expiration_time);
+    event AdminTransfer(address indexed admin, address indexed receiver, uint256 num_tokens, uint256 expiration_time, uint256 generation_time);
     event TokenRedeemed(address indexed subject, uint256 num_tokens, uint256 redeem_time);
     event TokenRefunded(address indexed admin, address indexed subject, uint256 num_tokens, uint256 refund_time);
     event TimeExtended(address indexed subject, uint256 new_time);
@@ -152,7 +152,7 @@ contract EVToken {
         balances[buyer].expiration_time = block.timestamp + 300;
         // Emit an event to indicate token being released for successful access
         // and has a 5 minute expiration time
-        emit AdminTransfer(admin, buyer, num_tokens, balances[buyer].expiration_time);
+        emit AdminTransfer(admin, buyer, num_tokens, balances[buyer].expiration_time, block.timestamp);
         return true;
     }
 
