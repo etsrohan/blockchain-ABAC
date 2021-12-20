@@ -23,14 +23,13 @@ ACCOUNTS = (
 INFURA_URL = "https://goerli.infura.io/v3/60febbc1f74c4e229c6f6f694ea571ac"
 
 w3 = Web3(Web3.HTTPProvider(INFURA_URL))
-
-if w3.isConnected:
-    print('[CONNECTED] Goerli Ethereum Test Network Connection Established!')
-    print(w3.eth.blockNumber)
-    
 w3.middleware_onion.inject(geth_poa_middleware, layer = 0)
 w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
 w3.middleware_onion.add(middleware.simple_cache_middleware)
+
+if w3.isConnected():
+    print('[CONNECTED] Goerli Ethereum Test Network Connection Established!')
+    print(w3.eth.blockNumber)
 
 for address in ACCOUNTS:
     print(f'Balance for Address 0x...{address[-4:]}: {w3.eth.get_balance(address)}')

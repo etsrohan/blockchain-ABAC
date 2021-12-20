@@ -1,8 +1,18 @@
 # Import Modules and Functions
-from solcx import compile_files, compile_source
+from solcx import compile_files
 import os
-from web3 import Web3
+from web3 import Web3, middleware
+from web3.middleware import geth_poa_middleware
+from web3.gas_strategies.time_based import *
 import json
+
+# Global Variables
+
+ADDR = "0xbB66eF34814f0613a3B738288FE55553A69C44BA"
+PRIVATE_KEY = "bee41af6acfa1c6f430646b8744e2f435f251db087971f38e5d9f2ea3a0b79c4"
+
+
+INFURA_URL = "https://goerli.infura.io/v3/60febbc1f74c4e229c6f6f694ea571ac"
 
 # Getting current working directory (cwd)
 cwd = os.getcwd()
@@ -29,24 +39,41 @@ compiled_sol = compile_files([cwd + '/Contracts/AccessControlContract.sol'])
 # 'userdoc', 'ast'
 
 # Connecting to Ganache Network
-ganache_url = 'HTTP://127.0.0.1:7545'
-w3 = Web3(Web3.HTTPProvider(ganache_url))
-
-# Check to see if connected to ganache
-if w3.isConnected():
-    print('\n[SUCCESS] CONNECTED TO GANACHE NETWORK\n')
-    
-# Get user input for initial balance of EVToken
-num_token = int(input('Please Enter the Total Supply of EVToken:'))
-print()
+w3 = Web3(Web3.HTTPProvider(INFURA_URL))
+w3.middleware_onion.inject(geth_poa_middleware, layer = 0)
+w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
+w3.middleware_onion.add(middleware.simple_cache_middleware)
 
 # set first account as default user or "Administrator"
-w3.eth.default_account = w3.eth.accounts[0]
+w3.eth.default_account = ADDR
+
+strategy = construct_time_based_gas_price_strategy(15)
+w3.eth.set_gas_price_strategy(strategy)
+
+nonce = w3.eth.get_transaction_count(ADDR)
+gas_price = w3.eth.generate_gas_price()
+print("Gas Price: ", gas_price)
+
+tr = {
+    'from': ADDR,
+    'gasPrice': Web3.toHex(gas_price),
+    'nonce': Web3.toHex(nonce)
+}
+# ----------------------------------------CONTINUE FROM HERE-----------------------------------------
+# Check to see if connected to ganache
+if w3.isConnected():
+    print('[CONNECTED] Goerli Ethereum Test Network Connection Established!')
+    
+# Get user input for initial balance of EVToken
+num_token = int(input('Please Enter the Total Supply of EVToken: '))
+print()
 
 CONTRACT_NAME = []
 ABI = []
 BYTECODE = []
 CONTRACT_ADDRESS = []
+
+nonce -= 1
 for name in compiled_sol.keys():
     # Skip Access Control because it needs to be deployed at the end
     if (name.split(':')[1] == 'AccessControl' or 
@@ -68,8 +95,15 @@ for name in compiled_sol.keys():
     
     # Create the Contract
     Contract = w3.eth.contract(abi = abi, bytecode = bytecode)
-    # submit transaction that deploys the contract
-    tx_hash = Contract.constructor().transact()
+    # Update nonce value
+    nonce += 1
+    tr['nonce'] = Web3.toHex(nonce)
+    # Build Constructor Transaction
+    txn = Contract.constructor().buildTransaction(tr)
+    # Sign the transaction
+    signed = w3.eth.account.sign_transaction(txn, PRIVATE_KEY)
+    # Send raw transaction
+    tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
     # wait for the transaction to be mined and get the transaction receipt
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     
@@ -104,8 +138,15 @@ for name in compiled_sol.keys():
     
     # Create the Contract
     Contract = w3.eth.contract(abi = abi, bytecode = bytecode)
-    # submit transaction that deploys the contract
-    tx_hash = Contract.constructor(num_token).transact()
+    # Update nonce value
+    nonce += 1
+    tr['nonce'] = Web3.toHex(nonce)
+    # Build Constructor Transaction
+    txn = Contract.constructor(num_token).buildTransaction(tr)
+    # Sign the transaction
+    signed = w3.eth.account.sign_transaction(txn, PRIVATE_KEY)
+    # Send raw transaction
+    tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
     # wait for the transaction to be mined and get the transaction receipt
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     
@@ -142,12 +183,19 @@ print(f'[DEPLOYING] Deploying {CONTRACT_NAME[-1]}...')
 # Creating the access control contract
 Access_Contract = w3.eth.contract(abi = access_abi,
                                   bytecode = access_bytecode)
-# Transact the constructor
-tx_hash = Access_Contract.constructor(
+# Update nonce value
+nonce += 1
+tr['nonce'] = Web3.toHex(nonce)
+# Build Constructor Transaction
+txn = Access_Contract.constructor(
     CONTRACT_ADDRESS[2],
     CONTRACT_ADDRESS[0],
     CONTRACT_ADDRESS[1],
-    CONTRACT_ADDRESS[3]).transact()
+    CONTRACT_ADDRESS[3]).buildTransaction(tr)
+# Sign the transaction
+signed = w3.eth.account.sign_transaction(txn, PRIVATE_KEY)
+# Send raw transaction
+tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
 # wait for the transaction to be mined and get the transaction receipt
 tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
