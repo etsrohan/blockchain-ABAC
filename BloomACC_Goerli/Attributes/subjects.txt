@@ -1,0 +1,5 @@
+Revel;Charge Point, 3650 Airport;Hybrid electric vehicle;John;MY 02 5XX3;50kWh
+Tesla;Charge Station, 123 sun road;Electric vehicle;Elon;NY 03 6TT6;80kWh
+Tata;Charge Point, yamuna highway;Electric vehicle;Ratan;UP 16 3205;70kWh
+OLA;Charge Point, DND;Electric Scooter;Marley;OH 22 7UI9;30kWh
+Mahindra;Charge Point, 3650 Airport;Hybrid electric vehicle;Rohan;UP 32 89OP;80kWh

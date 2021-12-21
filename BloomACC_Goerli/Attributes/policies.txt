@@ -1,0 +1,5 @@
+Revel;Charge Point, 3650 Airport;Hybrid electric vehicle;;;50kWh:DC;255 Openstreet;price per NW;10;100kW;Yes:true;false;false:600;0;1648439712
+Tesla;Charge Station, 123 sun road;Electric vehicle;;;80kWh:DC;3650 Airport;price per CS;10;150kW;Yes:true;false;true:30;0;1648439712
+Tata;Charge Point, yamuna highway;Electric vehicle;;;70kWh:DC;yamuna highway;price per CS;20;200kW;Yes:true;false;true:300;0;1648439712
+OLA;Charge Point, DND;Electric Scooter;;;30kWh:AC;DND;price per NW;5;100kW;No:true;true;true:60;0;1648439712
+Mahindra;Charge Point, 3650 Airport;Hybrid electric vehicle;;;80kWh:AC/DC;123 sun road;price per CS;3;100kW;Yes:true;false;false:60;0;1638439939

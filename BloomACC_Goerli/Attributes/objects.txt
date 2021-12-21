@@ -1,0 +1,5 @@
+DC;255 Openstreet;price per NW;10;100kW;Yes
+DC;3650 Airport;price per CS;10;150kW;Yes
+DC;yamuna highway;price per CS;20;200kW;Yes
+AC;DND;price per NW;5;100kW;No
+AC/DC;123 sun road;price per CS;3;100kW;Yes
