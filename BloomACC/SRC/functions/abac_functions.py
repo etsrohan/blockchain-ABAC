@@ -250,6 +250,11 @@ class BloomACCRunner:
         # Setting player addresses
         print("[PROCESSING] Setting players...")
         self.admin = self.w3.eth.accounts[0]
+        # Clear all the lists
+        self.ev_manufacturer = []
+        self.cs_leader = []
+        self.subjects = []
+        self.objects = []
         try:
             self.ev_manufacturer.append(self.w3.eth.accounts[11])
             self.ev_manufacturer.append(self.w3.eth.accounts[12])
@@ -351,11 +356,204 @@ class BloomACCRunner:
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
 
     def add_subject(self) -> None:
-        """EV Manufacturers adding EV's into the environment"""
-        nonce = self.w3.eth.get_transaction_count(self.ev_manufacturer[-1])
-        nonce -= 1
+        """EV Manufacturers adding EVs into the environment
+        Subject Attributes:
+          Manufacturer, Current Location, Vehicle Type, Owner Name
+          License Plate Number, Energy Capacity, ToMFR"""
+        # Get subject info
+        with open("./Attributes/subjects.txt", "r") as file:
+            sub_info = file.readlines()
         print()
-        for ev_address in self.subjects:
-            print(f"[PROCESSING] Adding EV [0x...{ev_address[-4:]}] to environment...")
-            nonce += 1
-            pass
+        # Create and start new threads for every subject
+        threads = []
+        for index, info in enumerate(sub_info):
+            # Remove \n from end of each string
+            if info[-1] == "\n":
+                info = info[:-1]
+            thread = threading.Thread(
+                target=self.send_subject,
+                args=(
+                    self.subjects[index],
+                    info,
+                    self.ev_manufacturer[-1],
+                ),
+            )
+            threads.append(thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        # Call subjects abi to confirm that subjects were added successfully
+        for address in self.subjects:
+            print(f"Subject: {self.sac_contract.functions.subjects(address).call()}")
+        print("\n[ADD SUBJECTS][SUCCESS] Transactions Successful\n")
+
+    def send_subject(self, sub_addr, info, ev_man) -> None:
+        """A helper function to send transaction for adding a new subject"""
+        try:
+            tx_hash = self.sac_contract.functions.subject_add(
+                sub_addr, info.split(";")
+            ).transact({"chainId": self.CHAIN_ID, "from": ev_man})
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            print(f"[SUCCESS] Added subject {info.split(';')[0]}")
+        except Exception as err:
+            print(err)
+            print("[ERROR] Remember to add EV Manufacturers to Subject Contract!")
+
+    def add_object(self) -> None:
+        """CS Leaders adding Charging Stations into the environment
+        Object Attributes:
+          Plug Type, Location, Pricing Model, Number of Charging Outlets
+          Charging Power, Fast Charging"""
+        # Get object info
+        with open("./Attributes/objects.txt", "r") as file:
+            obj_info = file.readlines()
+        print()
+        # Create and start new threads for every object
+        threads = []
+        for index, info in enumerate(obj_info):
+            # Remove \n from end of each string
+            if info[-1] == "\n":
+                info = info[:-1]
+            thread = threading.Thread(
+                target=self.send_object,
+                args=(
+                    self.objects[index],
+                    info,
+                    self.cs_leader[-1],
+                ),
+            )
+            threads.append(thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        # Call objects abi to confirm that objects were added successfully
+        for address in self.objects:
+            print(f"Object: {self.oac_contract.functions.objects(address).call()}")
+        print("\n[ADD OBJECTS][SUCCESS] Transactions Successful\n")
+
+    def send_object(self, obj_addr, info, cs_lead) -> None:
+        """A helper function to send transaction for adding a new object"""
+        try:
+            tx_hash = self.oac_contract.functions.object_add(
+                obj_addr, info.split(";")
+            ).transact({"chainId": self.CHAIN_ID, "from": cs_lead})
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            print(f"[SUCCESS] Added object {info.split(';')[1]}")
+        except Exception as err:
+            print(err)
+            print("[ERROR] Remember to add CS Leaders to Object Contract!")
+
+    def add_policy(self) -> None:
+        """Admin adding policies that control which subject can access what object.
+        Policy Content:
+        Subject = (Manufacturer, Current Location, Vehicle Type, Owner Name, License Plate Number, Energy Capacity, ToMFR)
+        Object = (Plug Type, Location, Pricing Model, Number of Charging Outlets, Charging Power, Fast Charging)
+        Action = (read, write, execute)
+        Context = (min_interval, start_time, end_time)
+        policy_add ABI expects 4 inputs: subject list, object list, action list, context list"""
+        # Get policy info
+        with open("./Attributes/policies.txt", "r") as file:
+            policy_info = file.readlines()
+
+        print()
+        threads = []
+        for policy in policy_info:
+            # Remove '\n' from end
+            if policy[-1] == "\n":
+                policy = policy[:-1]
+            thread = threading.Thread(
+                target=self.send_policy,
+                args=(policy,),
+            )
+            threads.append(thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        # Check if every policy was successfully added
+        for i in range(len(policy_info)):
+            print(f"Policy:\n{self.pmc_contract.functions.get_policy(i).call()}")
+        print("\n[ADD POLICY][SUCCESS] Transactions Successful\n")
+
+    def send_policy(self, policy) -> None:
+        """A helper function to add new policies to the PMC"""
+        # Split policy into subject, object, action, context
+        policy = policy.split(":")
+        if len(policy) != 4:
+            print("[ERROR] INVALID POLICY. MAKE SURE POLICY HAS 4 PARTS.")
+            return
+
+        for i in range(4):
+            policy[i] = policy[i].split(";")
+
+        # Loop through every action and turn it into a boolean
+        for i in range(3):
+            if policy[2][i].lower() == "true":
+                policy[2][i] = True
+            else:
+                policy[2][i] = False
+
+        # Convert context into list of 3 ints
+        for i in range(3):
+            policy[3][i] = int(policy[3][i])
+
+        # Send tx
+        tx_hash = self.pmc_contract.functions.policy_add(*policy).transact(
+            {"chainId": self.CHAIN_ID, "from": self.admin}
+        )
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        print(
+            f"""[SUCCESS] Added policy\n
+              \r\t{policy[0]}\n
+              \r\t{policy[1]}\n
+              \r\t{policy[2]}\n
+              \r\t{policy[3]}\n"""
+        )
+
+    def access_control(self) -> None:
+        """A method to get subject/object/action information and current location to call access control abi.
+        Access control ABI:
+        sub_id, obj_id, action all are ints
+               Subject Attributes:
+          Manufacturer, current_location, vehicle_type, charging_efficiency
+          discharging_efficiency, energy_capacity, ToMFR"""
+        sub_addr = self.subjects[int(input("Please select the subject account: "))]
+        obj_addr = self.objects[int(input("Please select the object account: "))]
+        action = int(input("Please select the action you want to perform: "))
+        location = input("Please enter your location: ")
+        attrib_list = ["" for i in range(6)]
+        attrib_list[1] = location
+
+        nonce = self.w3.eth.get_transaction_count(self.ev_manufacturer[-1])
+        try:
+            tx_hash = self.sac_contract.functions.change_attribs(
+                sub_addr, attrib_list
+            ).transact(
+                {
+                    "chainId": self.CHAIN_ID,
+                    "from": self.ev_manufacturer[-1],
+                    "nonce": nonce,
+                }
+            )
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            print(f"Sent current location...")
+        except Exception as err:
+            print(
+                f"""[ERROR] Subject with address (0x...{sub_addr[-4:]}) does not exist.\n{err}
+                \n\rOr make sure you have permissions to change attributes..."""
+            )
+
+        nonce = self.w3.eth.get_transaction_count(sub_addr)
+        tx_hash = self.acc_contract.functions.access_control(obj_addr, action).transact(
+            {
+                "chainId": self.CHAIN_ID,
+                "from": sub_addr,
+                "nonce": nonce,
+            }
+        )
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        print(
+            f"Sent access request for subject address: 0x...{sub_addr[-4:]}, object address: 0x...{obj_addr[-4:]} and action: {action}"
+        )
