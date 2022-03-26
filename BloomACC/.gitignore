@@ -1,0 +1,6 @@
+notes.txt
+.vscode
+*.contract
+test.py
+Info
+__pycache__
