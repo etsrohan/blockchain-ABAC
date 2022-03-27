@@ -13,7 +13,13 @@ class BloomACCRunner:
     """
     This class contains several methods and variables that help in the following functionality
     for the ABAC Blockchain Project:
-    Note add functions later...
+    Functionality:
+    1) Deploy system
+    2) Connect to existing (deployed) system
+    3) Add subjects (from pre-existing set)
+    4) Add objects (from pre-existing set)
+    5) Add policies (from pre-existing set)
+    6) Request access
     """
 
     # Class Variables
@@ -519,8 +525,8 @@ class BloomACCRunner:
                Subject Attributes:
           Manufacturer, current_location, vehicle_type, charging_efficiency
           discharging_efficiency, energy_capacity, ToMFR"""
-        sub_addr = self.subjects[int(input("Please select the subject account: "))]
-        obj_addr = self.objects[int(input("Please select the object account: "))]
+        sub_addr = input("Please enter the subject address: ")
+        obj_addr = input("Please enter the object address: ")
         action = int(input("Please select the action you want to perform: "))
         location = input("Please enter your location: ")
         attrib_list = ["" for i in range(6)]
