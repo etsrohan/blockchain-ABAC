@@ -1,5 +1,0 @@
-Computer1;NexG;Blockchain;Main;Office;None
-Projector1;NexG;Blockchain;Main;Conference;None
-Computer2;NexG;Android;Main;Office;None
-Computer3;NexG;Network;Main;Office;None
-Printer1;NexG;Database;Main;Office;None

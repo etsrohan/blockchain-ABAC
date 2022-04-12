@@ -1,5 +1,0 @@
-Rohan;NexG;Blockchain;Main;IE;None
-Rani;NexG;Blockchain;Main;Manager;None
-Surya;NexG;Network;Main;IE;None
-Harsha;NexG;Android;Main;IE;None
-Omi;NexG;Database;Main;Manager;None
