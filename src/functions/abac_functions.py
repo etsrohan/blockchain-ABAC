@@ -70,7 +70,7 @@ class BloomACCRunner:
         # Compiling the contracts
         cwd = os.getcwd()
         compiled_sol = compile_files(
-            [cwd + "/Contracts/AccessControlContract.sol"], solc_version="0.8.7"
+            [cwd + "/contracts/AccessControlContract.sol"], solc_version="0.8.7"
         )
 
         # Create web3 instance
@@ -367,7 +367,7 @@ class BloomACCRunner:
           Manufacturer, Current Location, Vehicle Type, Owner Name
           License Plate Number, Energy Capacity, ToMFR"""
         # Get subject info
-        with open("./Attributes/subjects.txt", "r") as file:
+        with open("./attributes/subjects.txt", "r") as file:
             sub_info = file.readlines()
         print()
         # Create and start new threads for every subject
@@ -412,7 +412,7 @@ class BloomACCRunner:
           Plug Type, Location, Pricing Model, Number of Charging Outlets
           Charging Power, Fast Charging"""
         # Get object info
-        with open("./Attributes/objects.txt", "r") as file:
+        with open("./attributes/objects.txt", "r") as file:
             obj_info = file.readlines()
         print()
         # Create and start new threads for every object
@@ -460,7 +460,7 @@ class BloomACCRunner:
         Context = (min_interval, start_time, end_time)
         policy_add ABI expects 4 inputs: subject list, object list, action list, context list"""
         # Get policy info
-        with open("./Attributes/policies.txt", "r") as file:
+        with open("./attributes/policies.txt", "r") as file:
             policy_info = file.readlines()
 
         print()

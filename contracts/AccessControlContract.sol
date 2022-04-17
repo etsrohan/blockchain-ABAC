@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import 'Contracts/PolicyManagementContract.sol';
-import 'Contracts/SubjectAttributeContract.sol';
-import 'Contracts/ObjectAttributeContract.sol';
-import 'Contracts/EVTokenContract.sol';
+import 'contracts/PolicyManagementContract.sol';
+import 'contracts/SubjectAttributeContract.sol';
+import 'contracts/ObjectAttributeContract.sol';
+import 'contracts/EVTokenContract.sol';
 
 contract AccessControl {
     // STRUCTS
