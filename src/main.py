@@ -11,6 +11,7 @@ def main(babac):
           \r4) Add objects from file
           \r5) Add policies from file
           \r6) Request access
+          \r7) Check balances
           \r==================================================================="""
     )
     choice = int(input("Please select from the above options [1-6] (exit = -1): "))
@@ -32,6 +33,10 @@ def main(babac):
         main(babac)
     elif choice == 6:
         babac.access_control()
+        main(babac)
+    elif choice == 7:
+        print("Printing account balances...")
+        babac.account_balances()
         main(babac)
     elif choice == -1:
         print("[EXIT] Closing program...")

@@ -207,8 +207,7 @@ class BloomACCRunner:
             print(f"[CREATING] Folder called '{folder}'")
             os.mkdir(folder)
         except FileExistsError as err:
-            print(f"[ERROR] {folder} already exists!")
-            print(f"{err}\n")
+            print(f"Reusing folder: {folder}\n")
 
         # Save Contract Info
         # ACC
@@ -563,3 +562,8 @@ class BloomACCRunner:
         print(
             f"Sent access request for subject address: 0x...{sub_addr[-4:]}, object address: 0x...{obj_addr[-4:]} and action: {action}"
         )
+
+    def account_balances(self) -> None:
+        """A function to display all the balances in the system"""
+        for account in self.w3.eth.accounts:
+            print(f"0x...{account[-4:]}: {self.evtoken_contract.functions.get_balance(account).call()}")
